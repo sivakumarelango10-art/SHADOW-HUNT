@@ -14,7 +14,7 @@ const outDir = path.resolve(here, '../public/audio');
 const SR = 22050;
 const marker = path.join(outDir, '.version');
 const version = crypto.createHash('sha1').update(fs.readFileSync(fileURLToPath(import.meta.url))).digest('hex');
-if (fs.existsSync(marker) && fs.readFileSync(marker, 'utf8') === version) process.exit(0);
+if (fs.existsSync(marker) && fs.readFileSync(marker, 'utf8') === version && fs.existsSync(path.join(outDir, 'heartbeat.wav'))) process.exit(0);
 fs.mkdirSync(outDir, { recursive: true });
 
 // ---------------------------------------------------------------- DSP helpers
