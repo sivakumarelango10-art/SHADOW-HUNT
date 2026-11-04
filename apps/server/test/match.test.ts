@@ -66,7 +66,7 @@ describe('multiplayer match', () => {
     code = r0.roomId;
     expect(code).toMatch(/^[A-Z2-9]{6}$/);
 
-    const info = await (await fetch(`${HTTP}/api/rooms/${code}`)).json();
+    const info = (await (await fetch(`${HTTP}/api/rooms/${code}`)).json()) as any;
     expect(info.exists).toBe(true);
 
     for (let i = 1; i < 5; i++) {
@@ -107,7 +107,7 @@ describe('multiplayer match', () => {
     expect(st(rest[1]!).players.get(hunter!.sessionId).role).toBe('hunter');
     await waitFor(() => st(host!).phase === 'playing', 'playing', 9000);
 
-    const info = await (await fetch(`${HTTP}/api/rooms/${code}`)).json();
+    const info = (await (await fetch(`${HTTP}/api/rooms/${code}`)).json()) as any;
     expect(info.joinable).toBe(false);
   }, 15000);
 
@@ -118,14 +118,25 @@ describe('multiplayer match', () => {
     const start = { x: me().x, z: me().z };
     let seq = 1;
     for (let i = 0; i < 20; i++) {
-      mover.send(C2S.input, { inputs: [{ seq: seq++, dt: 1 / 30, mx: 0, mz: 1, yaw: 0, pitch: 0, sprint: false, crouch: false }] });
+      mover.send(C2S.input, {
+        inputs: [{ seq: seq++, dt: 1 / 30, mx: 0, mz: 1, yaw: 0, pitch: 0, sprint: false, crouch: false }],
+      });
       await sleep(34);
     }
     await waitFor(() => Math.hypot(me().x - start.x, me().z - start.z) > 1, 'remote sees movement');
 
     // Speed hack: claim 2 seconds of movement in one burst.
     const before = { x: me().x, z: me().z };
-    const burst = Array.from({ length: 12 }, () => ({ seq: seq++, dt: 0.1, mx: 0, mz: 1, yaw: Math.PI, pitch: 0, sprint: true, crouch: false }));
+    const burst = Array.from({ length: 12 }, () => ({
+      seq: seq++,
+      dt: 0.1,
+      mx: 0,
+      mz: 1,
+      yaw: Math.PI,
+      pitch: 0,
+      sprint: true,
+      crouch: false,
+    }));
     mover.send(C2S.input, { inputs: burst });
     await sleep(250);
     const moved = Math.hypot(me().x - before.x, me().z - before.z);
@@ -140,20 +151,25 @@ describe('multiplayer match', () => {
     const H = g.state.players.get(hunterRoom.sessionId)!;
     const V = g.state.players.get(victimRoom.sessionId)!;
     // Out of range attack is rejected.
-    H.x = 0; H.z = 22; H.yaw = 0;
-    V.x = 0; V.z = 12;
+    H.x = 0;
+    H.z = 22;
+    H.yaw = 0;
+    V.x = 0;
+    V.z = 12;
     hunterRoom.send(C2S.attack, { viewDelayMs: 0 });
     await sleep(120);
     expect(V.condition).toBe('healthy');
 
     // In range, facing (yaw 0 looks toward -z).
     await waitFor(() => H.attackCd <= 0, 'attack cooldown');
-    V.x = 0; V.z = 20.4;
+    V.x = 0;
+    V.z = 20.4;
     hunterRoom.send(C2S.attack, { viewDelayMs: 0 });
     await waitFor(() => st(victimRoom).players.get(victimRoom.sessionId).condition === 'injured', 'victim injured');
 
     await waitFor(() => H.attackCd <= 0, 'hit cooldown', 4000);
-    V.x = 0; V.z = 20.4;
+    V.x = 0;
+    V.z = 20.4;
     hunterRoom.send(C2S.attack, { viewDelayMs: 0 });
     await waitFor(() => V.condition === 'downed', 'victim downed');
 
@@ -168,9 +184,12 @@ describe('multiplayer match', () => {
     expect(Math.hypot(V.x - cage.x, V.z - cage.z)).toBeLessThan(0.01);
 
     // Rescue: teammate stands at the cage and breaks it.
-    H.x = 40; H.z = -25;
+    H.x = 40;
+    H.z = -25;
     const R = g.state.players.get(rescuerRoom.sessionId)!;
-    R.x = cage.x + 1.2; R.z = cage.z; R.yaw = Math.PI / 2;
+    R.x = cage.x + 1.2;
+    R.z = cage.z;
+    R.yaw = Math.PI / 2;
     rescuerRoom.send(C2S.interact, { kind: 'rescue', id: victimRoom.sessionId });
     await waitFor(() => V.condition === 'rescued' || V.condition === 'injured', 'rescued', 5000);
     expect(g.runtime(rescuerRoom.sessionId)!.stats.rescues).toBe(1);
@@ -181,7 +200,9 @@ describe('multiplayer match', () => {
     const repairer = rooms[0]!;
     const P = g.state.players.get(repairer.sessionId)!;
     const gen = MAPS.asylum.generators.find((x) => x.id === 'gen_cafe')!;
-    P.x = gen.x - 1.3; P.z = gen.z; P.yaw = -Math.PI / 2; // face +x
+    P.x = gen.x - 1.3;
+    P.z = gen.z;
+    P.yaw = -Math.PI / 2; // face +x
     let check: SkillCheckMsg | null = null;
     let outcome = '';
     repairer.onMessage(S2C.skillCheck, (m: SkillCheckMsg) => (check = m));
@@ -230,9 +251,11 @@ describe('multiplayer match', () => {
     s.generators.get(last.id)!.progress = 0.995;
     const R0 = rooms[0]!;
     const P0 = s.players.get(R0.sessionId)!;
-    P0.x = last.x; P0.z = last.z;
+    P0.x = last.x;
+    P0.z = last.z;
     const off = { x: Math.sin(last.rot) * 1.3, z: Math.cos(last.rot) * 1.3 };
-    P0.x = last.x + off.x; P0.z = last.z + off.z;
+    P0.x = last.x + off.x;
+    P0.z = last.z + off.z;
     P0.yaw = Math.atan2(off.x, off.z);
     R0.send(C2S.interact, { kind: 'repair', id: last.id });
     await waitFor(() => st(rooms[4]!).powerOn === true, 'power on (replicated)', 8000);
@@ -240,10 +263,14 @@ describe('multiplayer match', () => {
     // Keys: pick up and insert two keys.
     const exit = MAPS.asylum.exits[0]!;
     for (const [keyId, key] of [...s.keys.entries()].slice(0, 2)) {
-      P0.x = key.x + 1; P0.z = key.z; P0.yaw = Math.PI / 2;
+      P0.x = key.x + 1;
+      P0.z = key.z;
+      P0.yaw = Math.PI / 2;
       R0.send(C2S.interact, { kind: 'pickupKey', id: keyId });
       await waitFor(() => P0.carryingKey, `picked ${keyId}`);
-      P0.x = exit.panel.x + 1; P0.z = exit.panel.z; P0.yaw = Math.PI / 2;
+      P0.x = exit.panel.x + 1;
+      P0.z = exit.panel.z;
+      P0.yaw = Math.PI / 2;
       R0.send(C2S.interact, { kind: 'depositKey', id: exit.id });
       await waitFor(() => !P0.carryingKey, `deposited ${keyId}`);
     }
@@ -257,11 +284,15 @@ describe('multiplayer match', () => {
     for (const r of survivors) {
       const p = s.players.get(r.sessionId)!;
       if (p.condition === 'healthy' || p.condition === 'injured' || p.condition === 'rescued') {
-        p.x = 0; p.z = 29;
+        p.x = 0;
+        p.z = 29;
       }
     }
     for (let i = 0; i < 30; i++) {
-      for (const r of survivors) r.send(C2S.input, { inputs: [{ seq: 100000 + i, dt: 1 / 30, mx: 0, mz: -1, yaw: 0, pitch: 0, sprint: false, crouch: false }] });
+      for (const r of survivors)
+        r.send(C2S.input, {
+          inputs: [{ seq: 100000 + i, dt: 1 / 30, mx: 0, mz: -1, yaw: 0, pitch: 0, sprint: false, crouch: false }],
+        });
       await sleep(34);
     }
     await waitFor(() => rooms.every((r) => results[rooms.indexOf(r)] !== null), 'results for everyone', 10000);
@@ -272,17 +303,21 @@ describe('multiplayer match', () => {
     const ids = new Set(results.map((r) => r!.matchId));
     expect(ids.size).toBe(1);
 
-    const prof = await (await fetch(`${HTTP}/api/profile`, { headers: { authorization: `Bearer ${tokens[0]!.token}` } })).json();
+    const prof = (await (
+      await fetch(`${HTTP}/api/profile`, { headers: { authorization: `Bearer ${tokens[0]!.token}` } })
+    ).json()) as any;
     expect(prof.profile.xp).toBeGreaterThan(0);
     expect(prof.profile.stats.totalMatches).toBe(1);
-    const hist = await (await fetch(`${HTTP}/api/history`, { headers: { authorization: `Bearer ${tokens[0]!.token}` } })).json();
+    const hist = (await (
+      await fetch(`${HTTP}/api/history`, { headers: { authorization: `Bearer ${tokens[0]!.token}` } })
+    ).json()) as any;
     expect(hist.history.length).toBe(1);
   }, 30000);
 
   it('returns to the lobby and can rematch', async () => {
     rooms[0]!.send(C2S.returnToLobby, {});
     await waitFor(() => rooms.every((r) => st(r).phase === 'lobby'), 'back in lobby');
-    const info = await (await fetch(`${HTTP}/api/rooms/${code}`)).json();
+    const info = (await (await fetch(`${HTTP}/api/rooms/${code}`)).json()) as any;
     expect(info.joinable).toBe(true);
   });
 });

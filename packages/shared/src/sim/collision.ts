@@ -200,14 +200,17 @@ export function segmentHitsAABB(x1: number, z1: number, x2: number, z2: number, 
     return true;
   };
   return (
-    clip(-dx, x1 - (b.minX - pad)) &&
-    clip(dx, b.maxX + pad - x1) &&
-    clip(-dz, z1 - (b.minZ - pad)) &&
-    clip(dz, b.maxZ + pad - z1)
+    clip(-dx, x1 - (b.minX - pad)) && clip(dx, b.maxX + pad - x1) && clip(-dz, z1 - (b.minZ - pad)) && clip(dz, b.maxZ + pad - z1)
   );
 }
 
-export function segmentHitsCircle(x1: number, z1: number, x2: number, z2: number, c: { x: number; z: number; r: number }): boolean {
+export function segmentHitsCircle(
+  x1: number,
+  z1: number,
+  x2: number,
+  z2: number,
+  c: { x: number; z: number; r: number },
+): boolean {
   const dx = x2 - x1;
   const dz = z2 - z1;
   const len2 = dx * dx + dz * dz || 1e-9;

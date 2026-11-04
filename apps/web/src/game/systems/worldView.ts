@@ -43,8 +43,18 @@ export function interactWorld(mapId: MapId, s: any): InteractWorld {
   const players: InteractPlayer[] = [];
   s.players?.forEach((p: any) =>
     players.push({
-      id: p.sessionId, role: p.role, characterId: p.characterId, condition: p.condition, x: p.x, z: p.z, yaw: p.yaw,
-      hiddenIn: p.hiddenIn, carryingKey: p.carryingKey, item: p.item, cageId: p.cageId, busy: p.action !== 'none',
+      id: p.sessionId,
+      role: p.role,
+      characterId: p.characterId,
+      condition: p.condition,
+      x: p.x,
+      z: p.z,
+      yaw: p.yaw,
+      hiddenIn: p.hiddenIn,
+      carryingKey: p.carryingKey,
+      item: p.item,
+      cageId: p.cageId,
+      busy: p.action !== 'none',
     }),
   );
   return {

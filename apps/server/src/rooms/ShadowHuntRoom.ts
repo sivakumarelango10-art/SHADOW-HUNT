@@ -120,7 +120,8 @@ export class ShadowHuntRoom extends Room<{ state: GameState }> {
     const p = this.state.players.get(client.sessionId);
     if (!p) return;
     p.connected = false;
-    const seconds = this.state.phase === 'playing' || this.state.phase === 'countdown' ? NET.reconnectSeconds : NET.lobbyReconnectSeconds;
+    const seconds =
+      this.state.phase === 'playing' || this.state.phase === 'countdown' ? NET.reconnectSeconds : NET.lobbyReconnectSeconds;
     this.allowReconnection(client, seconds);
     log.info('client dropped, awaiting reconnection', { session: client.sessionId, seconds });
   }
@@ -268,7 +269,10 @@ export class ShadowHuntRoom extends Room<{ state: GameState }> {
       const now = Date.now();
       if (now - (this.lastChat.get(c.sessionId) ?? 0) < 600) return;
       this.lastChat.set(c.sessionId, now);
-      const text = msg.text.replace(/\p{Cc}/gu, '').trim().slice(0, 140);
+      const text = msg.text
+        .replace(/\p{Cc}/gu, '')
+        .trim()
+        .slice(0, 140);
       if (!text) return;
       this.broadcast(S2C.chat, { from: c.sessionId, name: p.name, text } satisfies ChatMsg);
     });
@@ -276,10 +280,13 @@ export class ShadowHuntRoom extends Room<{ state: GameState }> {
     // ---- Gameplay (all validated inside Game)
     this.onMessage(C2S.input, (c, msg: { inputs?: unknown }) => this.game?.queueInputs(c.sessionId, msg?.inputs));
     this.onMessage(C2S.interact, (c, msg: { kind?: string; id?: string }) => {
-      if (typeof msg?.kind === 'string' && typeof msg?.id === 'string') this.game?.requestInteract(c.sessionId, msg.kind as InteractKind, msg.id);
+      if (typeof msg?.kind === 'string' && typeof msg?.id === 'string')
+        this.game?.requestInteract(c.sessionId, msg.kind as InteractKind, msg.id);
     });
     this.onMessage(C2S.interactStop, (c) => this.game?.stopInteract(c.sessionId));
-    this.onMessage(C2S.attack, (c, msg: { viewDelayMs?: number }) => this.game?.attack(c.sessionId, Number(msg?.viewDelayMs) || 0));
+    this.onMessage(C2S.attack, (c, msg: { viewDelayMs?: number }) =>
+      this.game?.attack(c.sessionId, Number(msg?.viewDelayMs) || 0),
+    );
     this.onMessage(C2S.ability, (c) => this.game?.useAbility(c.sessionId));
     this.onMessage(C2S.roar, (c) => this.game?.roar(c.sessionId));
     this.onMessage(C2S.flashlight, (c, msg: { on?: boolean }) => this.game?.setFlashlight(c.sessionId, msg?.on === true));

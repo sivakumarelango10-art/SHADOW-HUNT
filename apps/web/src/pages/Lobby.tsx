@@ -61,7 +61,11 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
         </button>
         <div>
           <div className="label">{snap.isPublic ? 'Public lobby' : 'Private room'}</div>
-          <button onClick={() => copy('code')} className="font-mono text-3xl tracking-[0.35em] text-bone transition hover:text-white" title="Copy room code">
+          <button
+            onClick={() => copy('code')}
+            className="font-mono text-3xl tracking-[0.35em] text-bone transition hover:text-white"
+            title="Copy room code"
+          >
             {snap.code}
           </button>
         </div>
@@ -90,7 +94,10 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
           </div>
           <div className="flex flex-col gap-2">
             {snap.players.map((p) => (
-              <div key={p.sessionId} className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${p.sessionId === sessionId ? 'border-bone/25 bg-white/[0.03]' : 'border-line'}`}>
+              <div
+                key={p.sessionId}
+                className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${p.sessionId === sessionId ? 'border-bone/25 bg-white/[0.03]' : 'border-line'}`}
+              >
                 <Avatar id={p.avatar} size={38} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
@@ -100,22 +107,35 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
                   </div>
                   <div className="text-[11px] text-dim">
                     Lv {p.level}
-                    {p.title ? ` · ${p.title}` : ''} · {CHARACTERS[p.survivorChar as CharacterId]?.name} / {CHARACTERS[p.hunterChar as CharacterId]?.name}
+                    {p.title ? ` · ${p.title}` : ''} · {CHARACTERS[p.survivorChar as CharacterId]?.name} /{' '}
+                    {CHARACTERS[p.hunterChar as CharacterId]?.name}
                   </div>
                 </div>
                 {!p.connected ? (
                   <span className="text-[11px] text-ember">offline</span>
                 ) : (
-                  <span className={`text-[11px] tracking-widest uppercase ${p.ready || p.isHost ? 'text-emerald-300' : 'text-dim'}`}>{p.ready || p.isHost ? 'Ready' : 'Not ready'}</span>
+                  <span
+                    className={`text-[11px] tracking-widest uppercase ${p.ready || p.isHost ? 'text-emerald-300' : 'text-dim'}`}
+                  >
+                    {p.ready || p.isHost ? 'Ready' : 'Not ready'}
+                  </span>
                 )}
                 {isHost && p.sessionId !== sessionId && (
-                  <button className="text-xs text-dim hover:text-red-300" onClick={() => send('kick', { sessionId: p.sessionId })} title="Remove from room">
+                  <button
+                    className="text-xs text-dim hover:text-red-300"
+                    onClick={() => send('kick', { sessionId: p.sessionId })}
+                    title="Remove from room"
+                  >
                     ✕
                   </button>
                 )}
               </div>
             ))}
-            {snap.players.length < 2 && <div className="rounded-lg border border-dashed border-line p-4 text-center text-sm text-dim">Share the code — friends join from “Join Room”, or open the invite link.</div>}
+            {snap.players.length < 2 && (
+              <div className="rounded-lg border border-dashed border-line p-4 text-center text-sm text-dim">
+                Share the code — friends join from “Join Room”, or open the invite link.
+              </div>
+            )}
           </div>
           <Chat />
         </section>
@@ -124,7 +144,14 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
         <section className="panel flex flex-col p-4">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="label">Your character</h2>
-            <Segmented value={tab} options={[{ value: 'survivor', label: 'Survivor' }, { value: 'hunter', label: 'Hunter' }]} onChange={setTab} />
+            <Segmented
+              value={tab}
+              options={[
+                { value: 'survivor', label: 'Survivor' },
+                { value: 'hunter', label: 'Hunter' },
+              ]}
+              onChange={setTab}
+            />
           </div>
           <div className="grid grid-cols-[1fr_auto] gap-4">
             <CharacterPreview id={selected} skin={profile?.equippedSkins[selected] ?? 'default'} className="h-64 md:h-80" />
@@ -158,7 +185,11 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
             <p className="mt-2 text-xs text-ash">{def.perk ?? (def.ability ? abilityText(def.ability) : '')}</p>
           </div>
           <div className="mt-auto flex flex-col gap-2 pt-4">
-            <Toggle label="I want to be the hunter" value={me.preferHunter} onChange={(v) => send('setPreferHunter', { prefer: v })} />
+            <Toggle
+              label="I want to be the hunter"
+              value={me.preferHunter}
+              onChange={(v) => send('setPreferHunter', { prefer: v })}
+            />
             {!isHost && (
               <button className={`btn ${me.ready ? '' : 'btn-primary'}`} onClick={() => send('setReady', { ready: !me.ready })}>
                 {me.ready ? 'Not ready' : 'Ready up'}
@@ -172,7 +203,13 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
           <h2 className="label mb-3">Map</h2>
           <div className="flex flex-col gap-2">
             {MAP_IDS.map((id) => (
-              <MapCard key={id} id={id} selected={snap.mapId === id} disabled={!isHost} onClick={() => send('setMap', { mapId: id })} />
+              <MapCard
+                key={id}
+                id={id}
+                selected={snap.mapId === id}
+                disabled={!isHost}
+                onClick={() => send('setMap', { mapId: id })}
+              />
             ))}
           </div>
           <h2 className="label mt-5 mb-2">Match settings {isHost ? '' : '(host)'}</h2>
@@ -189,7 +226,12 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
               <span className="text-sm">Generators</span>
               <Segmented
                 value={snap.generatorsSetting}
-                options={[{ value: 0, label: 'Auto' }, { value: 3, label: '3' }, { value: 4, label: '4' }, { value: 5, label: '5' }]}
+                options={[
+                  { value: 0, label: 'Auto' },
+                  { value: 3, label: '3' },
+                  { value: 4, label: '4' },
+                  { value: 5, label: '5' },
+                ]}
                 onChange={(g) => send('setSettings', { generatorsRequired: g })}
               />
             </div>
@@ -197,17 +239,26 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
               <span className="text-sm">Hunter</span>
               <Segmented
                 value={snap.hunterMode}
-                options={[{ value: 'player', label: 'A player' }, { value: 'bot', label: 'Bot' }]}
+                options={[
+                  { value: 'player', label: 'A player' },
+                  { value: 'bot', label: 'Bot' },
+                ]}
                 onChange={(m) => send('setSettings', { hunterMode: m })}
               />
             </div>
             <p className="text-[11px] text-dim">
-              {snap.hunterMode === 'bot' ? 'Everyone plays survivor against an AI hunter (good for practice or small groups).' : 'One player is chosen as the hunter — volunteers first.'}
+              {snap.hunterMode === 'bot'
+                ? 'Everyone plays survivor against an AI hunter (good for practice or small groups).'
+                : 'One player is chosen as the hunter — volunteers first.'}
             </p>
           </div>
           <div className="mt-auto pt-5">
             {isHost ? (
-              <button className="btn btn-primary w-full py-3 font-display text-base tracking-[0.2em] uppercase" disabled={!enough || !everyoneReady} onClick={() => send('startMatch', {})}>
+              <button
+                className="btn btn-primary w-full py-3 font-display text-base tracking-[0.2em] uppercase"
+                disabled={!enough || !everyoneReady}
+                onClick={() => send('startMatch', {})}
+              >
                 Start the hunt
               </button>
             ) : (
@@ -215,8 +266,14 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
                 <Spinner /> Waiting for the host…
               </div>
             )}
-            {isHost && !enough && <p className="mt-2 text-center text-xs text-dim">Need {snap.hunterMode === 'bot' ? 1 : MATCH.minPlayers}+ players — or switch the hunter to Bot.</p>}
-            {isHost && enough && !everyoneReady && <p className="mt-2 text-center text-xs text-dim">Waiting for everyone to ready up.</p>}
+            {isHost && !enough && (
+              <p className="mt-2 text-center text-xs text-dim">
+                Need {snap.hunterMode === 'bot' ? 1 : MATCH.minPlayers}+ players — or switch the hunter to Bot.
+              </p>
+            )}
+            {isHost && enough && !everyoneReady && (
+              <p className="mt-2 text-center text-xs text-dim">Waiting for everyone to ready up.</p>
+            )}
           </div>
         </section>
       </div>
@@ -271,7 +328,13 @@ function Chat() {
           setText('');
         }}
       >
-        <input className="field py-1.5 text-sm" placeholder="Say something…" value={text} maxLength={140} onChange={(e) => setText(e.target.value)} />
+        <input
+          className="field py-1.5 text-sm"
+          placeholder="Say something…"
+          value={text}
+          maxLength={140}
+          onChange={(e) => setText(e.target.value)}
+        />
         <button className="btn py-1.5">Send</button>
       </form>
     </div>

@@ -39,7 +39,13 @@ export function Hud({ snap, me }: { snap: RoomSnapshot; me: PlayerView }) {
       <TerrorVignette />
       <HitFlash />
       {me.hiddenIn && <LockerOverlay />}
-      {survivor && me.condition === 'downed' && <StateBanner title="You are down" sub={`Bleeding out · ${Math.ceil(me.bleedTimer)}s — crawl to cover, wait for help`} tone="danger" />}
+      {survivor && me.condition === 'downed' && (
+        <StateBanner
+          title="You are down"
+          sub={`Bleeding out · ${Math.ceil(me.bleedTimer)}s — crawl to cover, wait for help`}
+          tone="danger"
+        />
+      )}
       {survivor && me.condition === 'captured' && (
         <StateBanner
           title="Caged"
@@ -127,20 +133,31 @@ function ObjectiveBar({ snap, me }: { snap: RoomSnapshot; me: PlayerView }) {
   return (
     <div className="absolute top-3 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1.5">
       <div className="flex items-center gap-3 rounded-full border border-line bg-black/55 px-4 py-1.5 backdrop-blur-sm">
-        <span className={`font-mono text-sm tabular-nums ${low ? 'animate-pulse text-blood' : 'text-bone'}`}>{fmtTime(snap.timeLeft)}</span>
+        <span className={`font-mono text-sm tabular-nums ${low ? 'animate-pulse text-blood' : 'text-bone'}`}>
+          {fmtTime(snap.timeLeft)}
+        </span>
         <span className="h-3 w-px bg-line-strong" />
         <span className="flex items-center gap-1" title="Generators">
           {Array.from({ length: snap.generatorsRequired }, (_, i) => (
-            <span key={i} className={`h-2.5 w-2.5 rotate-45 border ${i < snap.generatorsCompleted ? 'border-amber-200 bg-amber-200 shadow-[0_0_8px_#fcd34d]' : 'border-ash/60'}`} />
+            <span
+              key={i}
+              className={`h-2.5 w-2.5 rotate-45 border ${i < snap.generatorsCompleted ? 'border-amber-200 bg-amber-200 shadow-[0_0_8px_#fcd34d]' : 'border-ash/60'}`}
+            />
           ))}
         </span>
         <span className="h-3 w-px bg-line-strong" />
         <span className={`text-xs tracking-wider ${snap.powerOn ? 'text-bone' : 'text-dim'}`}>
           ⚷ {snap.keysDeposited}/{snap.keysRequired}
         </span>
-        {snap.exitsOpen > 0 && <span className="text-xs font-semibold tracking-widest text-emerald-300 uppercase">Exit open</span>}
+        {snap.exitsOpen > 0 && (
+          <span className="text-xs font-semibold tracking-widest text-emerald-300 uppercase">Exit open</span>
+        )}
       </div>
-      <div className={`text-[11px] font-semibold tracking-[0.25em] uppercase ${text === 'ESCAPE' ? 'animate-pulse text-emerald-300' : 'text-ash'}`}>{text}</div>
+      <div
+        className={`text-[11px] font-semibold tracking-[0.25em] uppercase ${text === 'ESCAPE' ? 'animate-pulse text-emerald-300' : 'text-ash'}`}
+      >
+        {text}
+      </div>
     </div>
   );
 }
@@ -152,13 +169,26 @@ function TeamList({ snap, me }: { snap: RoomSnapshot; me: PlayerView }) {
       {survivors.map((p) => {
         const c = CONDITION[p.condition] ?? CONDITION.healthy!;
         return (
-          <div key={p.sessionId} className={`flex min-w-40 items-center gap-2 rounded-md border border-line bg-black/45 px-2 py-1 backdrop-blur-sm ${p.sessionId === me.sessionId ? 'border-bone/30' : ''}`}>
+          <div
+            key={p.sessionId}
+            className={`flex min-w-40 items-center gap-2 rounded-md border border-line bg-black/45 px-2 py-1 backdrop-blur-sm ${p.sessionId === me.sessionId ? 'border-bone/30' : ''}`}
+          >
             <span className="h-2 w-2 rounded-full" style={{ background: c.color, boxShadow: `0 0 6px ${c.color}` }} />
-            <span className={`max-w-24 truncate text-xs ${p.condition === 'eliminated' ? 'text-dim line-through' : ''}`}>{p.name}</span>
-            <span className="ml-auto text-[10px] tracking-wider uppercase" style={{ color: c.color }}>
-              {p.condition === 'captured' ? `${Math.ceil(p.captureTimer)}s` : p.condition === 'downed' ? `${Math.ceil(p.bleedTimer)}s` : c.label}
+            <span className={`max-w-24 truncate text-xs ${p.condition === 'eliminated' ? 'text-dim line-through' : ''}`}>
+              {p.name}
             </span>
-            {p.carryingKey && <span title="Carrying a key" className="text-[10px] text-amber-300">⚷</span>}
+            <span className="ml-auto text-[10px] tracking-wider uppercase" style={{ color: c.color }}>
+              {p.condition === 'captured'
+                ? `${Math.ceil(p.captureTimer)}s`
+                : p.condition === 'downed'
+                  ? `${Math.ceil(p.bleedTimer)}s`
+                  : c.label}
+            </span>
+            {p.carryingKey && (
+              <span title="Carrying a key" className="text-[10px] text-amber-300">
+                ⚷
+              </span>
+            )}
             {!p.connected && <span className="text-[10px] text-ember">offline</span>}
           </div>
         );
@@ -175,7 +205,10 @@ function Bar({ value, color, label, pulse }: { value: number; color: string; lab
         <span className="tabular-nums">{Math.round(value)}</span>
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-        <div className={`h-full rounded-full transition-[width] duration-150 ${pulse ? 'animate-pulse' : ''}`} style={{ width: `${Math.max(0, Math.min(100, value))}%`, background: color }} />
+        <div
+          className={`h-full rounded-full transition-[width] duration-150 ${pulse ? 'animate-pulse' : ''}`}
+          style={{ width: `${Math.max(0, Math.min(100, value))}%`, background: color }}
+        />
       </div>
     </div>
   );
@@ -185,19 +218,35 @@ function SurvivorVitals({ me, touch }: { me: PlayerView; touch: boolean }) {
   const stamina = useHud((s) => s.stamina);
   const exhausted = useHud((s) => s.exhausted);
   return (
-    <div className={`absolute flex flex-col gap-2.5 rounded-xl border border-line bg-black/45 p-3 backdrop-blur-sm ${touch ? TOUCH_VITALS : 'bottom-4 left-4'}`}>
+    <div
+      className={`absolute flex flex-col gap-2.5 rounded-xl border border-line bg-black/45 p-3 backdrop-blur-sm ${touch ? TOUCH_VITALS : 'bottom-4 left-4'}`}
+    >
       <div className="flex items-center gap-2">
         {Array.from({ length: PLAYER.maxHealth }, (_, i) => (
-          <span key={i} className={`h-3 w-6 rounded-sm border ${i < me.health ? 'border-blood bg-blood shadow-[0_0_8px_var(--color-blood)]' : 'border-white/20'}`} />
+          <span
+            key={i}
+            className={`h-3 w-6 rounded-sm border ${i < me.health ? 'border-blood bg-blood shadow-[0_0_8px_var(--color-blood)]' : 'border-white/20'}`}
+          />
         ))}
         <span className="ml-1 text-[11px] tracking-widest uppercase" style={{ color: CONDITION[me.condition]?.color }}>
           {CONDITION[me.condition]?.label}
         </span>
       </div>
-      <Bar value={stamina} color={exhausted ? '#7a3a3a' : '#c9c2b2'} label={exhausted ? 'Exhausted' : 'Stamina'} pulse={exhausted} />
-      <Bar value={me.battery} color={me.battery < 20 ? '#d9783a' : '#a8bcd8'} label={`Flashlight ${me.flashlight ? 'on' : 'off'}`} />
+      <Bar
+        value={stamina}
+        color={exhausted ? '#7a3a3a' : '#c9c2b2'}
+        label={exhausted ? 'Exhausted' : 'Stamina'}
+        pulse={exhausted}
+      />
+      <Bar
+        value={me.battery}
+        color={me.battery < 20 ? '#d9783a' : '#a8bcd8'}
+        label={`Flashlight ${me.flashlight ? 'on' : 'off'}`}
+      />
       <div className="flex items-center gap-2 text-[11px] tracking-wider text-ash">
-        <span className="rounded border border-line px-1.5 py-0.5">{me.item ? `G · ${itemLabel(me.item as ItemKind)}` : 'No item'}</span>
+        <span className="rounded border border-line px-1.5 py-0.5">
+          {me.item ? `G · ${itemLabel(me.item as ItemKind)}` : 'No item'}
+        </span>
         {me.carryingKey && <span className="rounded border border-amber-300/40 px-1.5 py-0.5 text-amber-200">⚷ Access key</span>}
       </div>
     </div>
@@ -212,9 +261,19 @@ function Cooldown({ label, value, max, keyHint }: { label: string; value: number
       <div className="relative h-14 w-14">
         <svg viewBox="0 0 40 40" className="h-full w-full -rotate-90">
           <circle cx="20" cy="20" r="17" fill="rgba(0,0,0,0.5)" stroke="rgba(255,255,255,0.12)" strokeWidth="3" />
-          <circle cx="20" cy="20" r="17" fill="none" stroke={ready ? '#d1232f' : '#7a6a6a'} strokeWidth="3" strokeDasharray={`${k * 106.8} 106.8`} />
+          <circle
+            cx="20"
+            cy="20"
+            r="17"
+            fill="none"
+            stroke={ready ? '#d1232f' : '#7a6a6a'}
+            strokeWidth="3"
+            strokeDasharray={`${k * 106.8} 106.8`}
+          />
         </svg>
-        <div className="absolute inset-0 flex items-center justify-center text-xs font-semibold tabular-nums">{ready ? keyHint : Math.ceil(value)}</div>
+        <div className="absolute inset-0 flex items-center justify-center text-xs font-semibold tabular-nums">
+          {ready ? keyHint : Math.ceil(value)}
+        </div>
       </div>
       <div className="text-[10px] tracking-[0.18em] text-ash uppercase">{label}</div>
     </div>
@@ -228,7 +287,9 @@ function HunterVitals({ me, snap, touch }: { me: PlayerView; snap: RoomSnapshot;
   const caged = survivors.filter((p) => p.condition === 'captured').length;
   const dead = survivors.filter((p) => p.condition === 'eliminated').length;
   return (
-    <div className={`absolute flex items-end gap-4 rounded-xl border border-line bg-black/45 p-3 backdrop-blur-sm ${touch ? TOUCH_VITALS : 'bottom-4 left-4'}`}>
+    <div
+      className={`absolute flex items-end gap-4 rounded-xl border border-line bg-black/45 p-3 backdrop-blur-sm ${touch ? TOUCH_VITALS : 'bottom-4 left-4'}`}
+    >
       <Cooldown label="Attack" value={me.attackCd} max={HUNTER.attackCooldownHit} keyHint="LMB" />
       {ab && <Cooldown label={def.ability!.replace('_', ' ')} value={me.abilityCd} max={ab.cooldown} keyHint="Q" />}
       <Cooldown label="Roar" value={me.roarCd} max={HUNTER.roarCooldown} keyHint="R" />
@@ -240,10 +301,13 @@ function HunterVitals({ me, snap, touch }: { me: PlayerView; snap: RoomSnapshot;
           Taken <span className="text-blood">{dead}</span>
         </div>
         <div>
-          Left <span className="text-bone">{survivors.length - dead - survivors.filter((p) => p.condition === 'escaped').length}</span>
+          Left{' '}
+          <span className="text-bone">{survivors.length - dead - survivors.filter((p) => p.condition === 'escaped').length}</span>
         </div>
       </div>
-      {(me.action === 'stunned' || me.action === 'blinded') && <div className="ml-2 animate-pulse text-xs tracking-widest text-ember uppercase">{me.action}</div>}
+      {(me.action === 'stunned' || me.action === 'blinded') && (
+        <div className="ml-2 animate-pulse text-xs tracking-widest text-ember uppercase">{me.action}</div>
+      )}
     </div>
   );
 }
@@ -257,11 +321,15 @@ function Prompt() {
   return (
     <div className="absolute bottom-[22%] left-1/2 flex -translate-x-1/2 flex-col items-center gap-2">
       {prompt && (
-        <div className={`flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm backdrop-blur-sm ${prompt.disabled ? 'border-line bg-black/50 text-dim' : 'border-bone/25 bg-black/60'}`}>
+        <div
+          className={`flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm backdrop-blur-sm ${prompt.disabled ? 'border-line bg-black/50 text-dim' : 'border-bone/25 bg-black/60'}`}
+        >
           <kbd className="rounded border border-bone/40 px-1.5 text-xs">E</kbd>
           <span>{prompt.label}</span>
           {prompt.disabled && <span className="text-xs text-ember">· {prompt.disabled}</span>}
-          {!prompt.disabled && (prompt.continuous || prompt.duration > 1.5) && <span className="text-[10px] tracking-widest text-ash uppercase">hold</span>}
+          {!prompt.disabled && (prompt.continuous || prompt.duration > 1.5) && (
+            <span className="text-[10px] tracking-widest text-ash uppercase">hold</span>
+          )}
         </div>
       )}
       {progress > 0 && (
@@ -275,7 +343,9 @@ function Prompt() {
 }
 
 function Crosshair() {
-  return <div className="absolute top-1/2 left-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-bone/70 shadow-[0_0_4px_black]" />;
+  return (
+    <div className="absolute top-1/2 left-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-bone/70 shadow-[0_0_4px_black]" />
+  );
 }
 
 function Spectating() {
@@ -302,7 +372,11 @@ function Feed() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0 }}
             className={`rounded-md border bg-black/55 px-3 py-1.5 text-xs backdrop-blur-sm ${
-              f.tone === 'danger' ? 'border-blood/50 text-red-200' : f.tone === 'success' ? 'border-emerald-400/30 text-emerald-100' : 'border-line text-bone'
+              f.tone === 'danger'
+                ? 'border-blood/50 text-red-200'
+                : f.tone === 'success'
+                  ? 'border-emerald-400/30 text-emerald-100'
+                  : 'border-line text-bone'
             }`}
           >
             {f.text}
@@ -319,7 +393,13 @@ function Notices() {
     <div className="absolute top-[30%] left-1/2 flex -translate-x-1/2 flex-col items-center gap-2">
       <AnimatePresence>
         {notices.map((n) => (
-          <motion.div key={n.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="rounded-md bg-black/70 px-4 py-2 text-sm text-bone">
+          <motion.div
+            key={n.id}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="rounded-md bg-black/70 px-4 py-2 text-sm text-bone"
+          >
             {n.text}
           </motion.div>
         ))}
@@ -361,7 +441,9 @@ function LockerOverlay() {
       {Array.from({ length: 9 }, (_, i) => (
         <div key={i} className="absolute left-0 h-[7%] w-full bg-black" style={{ top: `${i * 11.5}%` }} />
       ))}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-[0.3em] text-ash uppercase">Hiding · press E to leave</div>
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-[0.3em] text-ash uppercase">
+        Hiding · press E to leave
+      </div>
     </div>
   );
 }
@@ -386,7 +468,9 @@ function StatusBoard({ snap }: { snap: RoomSnapshot }) {
               <td className="py-1.5">{p.name}</td>
               <td className="text-ash">{CHARACTERS[p.characterId as CharacterId]?.name}</td>
               <td className={p.role === 'hunter' ? 'text-blood' : 'text-ash'}>{p.role}</td>
-              <td style={{ color: CONDITION[p.condition]?.color }}>{p.role === 'survivor' ? CONDITION[p.condition]?.label : p.isBot ? 'bot' : ''}</td>
+              <td style={{ color: CONDITION[p.condition]?.color }}>
+                {p.role === 'survivor' ? CONDITION[p.condition]?.label : p.isBot ? 'bot' : ''}
+              </td>
               <td className="text-right text-xs text-dim">{p.connected ? '' : 'offline'}</td>
             </tr>
           ))}

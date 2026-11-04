@@ -40,11 +40,19 @@ export function MainMenu() {
   const lp = profile ? levelProgress(profile.xp) : null;
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative z-10 flex h-full flex-col">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="relative z-10 flex h-full flex-col"
+    >
       <header className="flex items-center justify-between px-5 pt-5 md:px-10 md:pt-8">
         <div className="text-[11px] tracking-[0.4em] text-dim uppercase">Online · asymmetric horror</div>
         {profile && (
-          <button onClick={() => go('profile')} className="flex items-center gap-3 rounded-full border border-line bg-black/40 py-1 pr-4 pl-1 backdrop-blur-sm transition hover:border-bone/30">
+          <button
+            onClick={() => go('profile')}
+            className="flex items-center gap-3 rounded-full border border-line bg-black/40 py-1 pr-4 pl-1 backdrop-blur-sm transition hover:border-bone/30"
+          >
             <Avatar id={profile.avatar} size={36} />
             <div className="text-left">
               <div className="text-sm leading-tight">{profile.username}</div>
@@ -72,14 +80,22 @@ export function MainMenu() {
             <br />
             <span className="text-blood animate-flicker">HUNT</span>
           </motion.h1>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="mt-4 font-display text-sm tracking-[0.25em] text-ash md:text-base">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mt-4 font-display text-sm tracking-[0.25em] text-ash md:text-base"
+          >
             Stay together. Stay silent. Survive the hunt.
           </motion.p>
 
           <div className="mt-8 flex w-full max-w-sm flex-col gap-2.5">
             {status === 'offline' ? (
               <div className="rounded-lg border border-ember/40 bg-black/50 p-4 text-sm text-ember">
-                Cannot reach the game server. <button className="underline" onClick={() => useSession.getState().init()}>Retry</button>
+                Cannot reach the game server.{' '}
+                <button className="underline" onClick={() => useSession.getState().init()}>
+                  Retry
+                </button>
               </div>
             ) : status !== 'ready' ? (
               <div className="flex items-center gap-3 text-sm text-ash">
@@ -88,7 +104,13 @@ export function MainMenu() {
             ) : (
               <AnimatePresence mode="wait">
                 {panel === 'none' && (
-                  <motion.div key="main" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} className="flex flex-col gap-2.5">
+                  <motion.div
+                    key="main"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    className="flex flex-col gap-2.5"
+                  >
                     <MenuButton primary onClick={() => setPanel('play')} hint="Create · Join · Quick">
                       Play
                     </MenuButton>
@@ -103,8 +125,19 @@ export function MainMenu() {
                   </motion.div>
                 )}
                 {panel === 'play' && (
-                  <motion.div key="play" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} className="flex flex-col gap-2.5">
-                    <MenuButton primary disabled={busy} onClick={() => run(() => createRoom(false))} hint="Private · invite friends">
+                  <motion.div
+                    key="play"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    className="flex flex-col gap-2.5"
+                  >
+                    <MenuButton
+                      primary
+                      disabled={busy}
+                      onClick={() => run(() => createRoom(false))}
+                      hint="Private · invite friends"
+                    >
                       Create Room
                     </MenuButton>
                     <MenuButton disabled={busy} onClick={() => setPanel('join')} hint="Enter a code">

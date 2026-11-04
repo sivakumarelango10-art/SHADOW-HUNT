@@ -55,7 +55,8 @@ export function roundTripMs() {
 function friendly(e: unknown): string {
   const err = e as { code?: number; message?: string };
   const msg = err?.message ?? String(e);
-  if (/not found|no rooms found|invalid room/i.test(msg) || err?.code === 4212) return 'No room with that code. Check it and try again.';
+  if (/not found|no rooms found|invalid room/i.test(msg) || err?.code === 4212)
+    return 'No room with that code. Check it and try again.';
   if (/locked|full/i.test(msg)) return 'That room is full or a match is in progress.';
   if (/ECONNREFUSED|failed to fetch|network|connect/i.test(msg)) return 'Cannot reach the game server.';
   return msg;
@@ -63,14 +64,43 @@ function friendly(e: unknown): string {
 
 function toView(p: any): PlayerView {
   return {
-    sessionId: p.sessionId, playerId: p.playerId, name: p.name, title: p.title, avatar: p.avatar, level: p.level,
-    survivorChar: p.survivorChar, hunterChar: p.hunterChar, characterId: p.characterId, skinId: p.skinId, role: p.role,
-    isHost: p.isHost, isBot: p.isBot, ready: p.ready, preferHunter: p.preferHunter, connected: p.connected,
-    condition: p.condition, health: p.health, stamina: p.stamina, exhausted: p.exhausted, battery: p.battery,
-    flashlight: p.flashlight, action: p.action, actionTarget: p.actionTarget, actionProgress: p.actionProgress,
-    hiddenIn: p.hiddenIn, carryingKey: p.carryingKey, item: p.item, cageId: p.cageId, captureStage: p.captureStage,
-    captureTimer: p.captureTimer, bleedTimer: p.bleedTimer, abilityCd: p.abilityCd, roarCd: p.roarCd, attackCd: p.attackCd,
-    x: p.x, z: p.z,
+    sessionId: p.sessionId,
+    playerId: p.playerId,
+    name: p.name,
+    title: p.title,
+    avatar: p.avatar,
+    level: p.level,
+    survivorChar: p.survivorChar,
+    hunterChar: p.hunterChar,
+    characterId: p.characterId,
+    skinId: p.skinId,
+    role: p.role,
+    isHost: p.isHost,
+    isBot: p.isBot,
+    ready: p.ready,
+    preferHunter: p.preferHunter,
+    connected: p.connected,
+    condition: p.condition,
+    health: p.health,
+    stamina: p.stamina,
+    exhausted: p.exhausted,
+    battery: p.battery,
+    flashlight: p.flashlight,
+    action: p.action,
+    actionTarget: p.actionTarget,
+    actionProgress: p.actionProgress,
+    hiddenIn: p.hiddenIn,
+    carryingKey: p.carryingKey,
+    item: p.item,
+    cageId: p.cageId,
+    captureStage: p.captureStage,
+    captureTimer: p.captureTimer,
+    bleedTimer: p.bleedTimer,
+    abilityCd: p.abilityCd,
+    roarCd: p.roarCd,
+    attackCd: p.attackCd,
+    x: p.x,
+    z: p.z,
   };
 }
 
@@ -78,12 +108,31 @@ function buildSnapshot(s: any): RoomSnapshot {
   const players: PlayerView[] = [];
   s.players?.forEach((p: any) => players.push(toView(p)));
   const generators: RoomSnapshot['generators'] = {};
-  s.generators?.forEach((g: any, id: string) => (generators[id] = { progress: g.progress, completed: g.completed, kicked: g.kicked, repairers: g.repairers }));
+  s.generators?.forEach(
+    (g: any, id: string) =>
+      (generators[id] = { progress: g.progress, completed: g.completed, kicked: g.kicked, repairers: g.repairers }),
+  );
   return {
-    code: s.roomCode, phase: s.phase, mapId: s.mapId, hostId: s.hostId, isPublic: s.isPublic, matchMinutes: s.matchMinutes,
-    generatorsSetting: s.generatorsSetting, hunterMode: s.hunterMode, countdown: s.countdown, timeLeft: s.timeLeft,
-    elapsed: s.elapsed, powerOn: s.powerOn, generatorsRequired: s.generatorsRequired, generatorsCompleted: s.generatorsCompleted,
-    keysRequired: s.keysRequired, keysDeposited: s.keysDeposited, exitsOpen: s.exitsOpen, winner: s.winner, players, generators,
+    code: s.roomCode,
+    phase: s.phase,
+    mapId: s.mapId,
+    hostId: s.hostId,
+    isPublic: s.isPublic,
+    matchMinutes: s.matchMinutes,
+    generatorsSetting: s.generatorsSetting,
+    hunterMode: s.hunterMode,
+    countdown: s.countdown,
+    timeLeft: s.timeLeft,
+    elapsed: s.elapsed,
+    powerOn: s.powerOn,
+    generatorsRequired: s.generatorsRequired,
+    generatorsCompleted: s.generatorsCompleted,
+    keysRequired: s.keysRequired,
+    keysDeposited: s.keysDeposited,
+    exitsOpen: s.exitsOpen,
+    winner: s.winner,
+    players,
+    generators,
   };
 }
 

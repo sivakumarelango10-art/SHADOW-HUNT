@@ -77,7 +77,12 @@ function limb(parent: THREE.Object3D, at: [number, number, number], r: number, l
 }
 
 const SKIN_TONES: Record<string, string> = {
-  alex: '#c69a7a', mia: '#e2b99a', ethan: '#8d5f45', luna: '#e8c4a8', noah: '#6b4632', ava: '#d1a184',
+  alex: '#c69a7a',
+  mia: '#e2b99a',
+  ethan: '#8d5f45',
+  luna: '#e8c4a8',
+  noah: '#6b4632',
+  ava: '#d1a184',
 };
 
 export function createRig(characterId: CharacterId, skinId: string, shadows: boolean): Rig {
@@ -177,7 +182,11 @@ function survivorRig(def: CharacterDef, skinId: string, shadows: boolean): Rig {
   const torch = new THREE.Group();
   torch.position.set(0, -0.08, -0.03);
   handR.add(torch);
-  const torchBody = mesh(new THREE.CylinderGeometry(0.028, 0.022, 0.2, 10), mat('#1d1f22', { metalness: 0.6, roughness: 0.4 }), false);
+  const torchBody = mesh(
+    new THREE.CylinderGeometry(0.028, 0.022, 0.2, 10),
+    mat('#1d1f22', { metalness: 0.6, roughness: 0.4 }),
+    false,
+  );
   torch.add(torchBody);
   const lens = mesh(new THREE.CircleGeometry(0.026, 12), new THREE.MeshBasicMaterial({ color: '#fff6dc' }), false);
   lens.position.y = -0.101;
@@ -200,7 +209,11 @@ function survivorRig(def: CharacterDef, skinId: string, shadows: boolean): Rig {
     f.add(shoe);
   }
   // key on belt
-  const keyMesh = mesh(box(0.03, 0.08, 0.01), mat('#d8b860', { emissive: '#7a5a10', emissiveIntensity: 1, metalness: 0.8 }), false);
+  const keyMesh = mesh(
+    box(0.03, 0.08, 0.01),
+    mat('#d8b860', { emissive: '#7a5a10', emissiveIntensity: 1, metalness: 0.8 }),
+    false,
+  );
   keyMesh.position.set(0.16 * B, -0.06, -0.1);
   hips.add(keyMesh);
 
@@ -225,7 +238,9 @@ function survivorRig(def: CharacterDef, skinId: string, shadows: boolean): Rig {
     const downed = p.condition === 'downed';
     const captured = p.condition === 'captured';
     downBlend += ((downed ? 1 : 0) - downBlend) * Math.min(1, dt * 6);
-    const working = ['repair', 'rescue', 'revive', 'heal', 'openExit', 'depositKey', 'pickupKey', 'pickup', 'selfheal'].includes(p.action);
+    const working = ['repair', 'rescue', 'revive', 'heal', 'openExit', 'depositKey', 'pickupKey', 'pickup', 'selfheal'].includes(
+      p.action,
+    );
     const kneel = captured || (working && p.action !== 'openExit' && p.action !== 'depositKey');
     crouchBlend += ((p.crouching || kneel ? 1 : 0) - crouchBlend) * Math.min(1, dt * 8);
 

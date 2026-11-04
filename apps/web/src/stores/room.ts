@@ -112,7 +112,8 @@ export const useRoom = create<RoomStore>((set, get) => ({
     setTimeout(() => set({ notices: get().notices.filter((f) => f.id !== t.id) }), 3200);
   },
   pushChat: (m) => set({ chat: [...get().chat.slice(-60), m] }),
-  reset: () => set({ connection: 'idle', error: null, sessionId: null, snap: null, results: null, chat: [], feed: [], notices: [] }),
+  reset: () =>
+    set({ connection: 'idle', error: null, sessionId: null, snap: null, results: null, chat: [], feed: [], notices: [] }),
 }));
 
 export function selfView(): PlayerView | undefined {

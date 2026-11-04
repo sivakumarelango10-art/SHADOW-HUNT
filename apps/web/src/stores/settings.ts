@@ -75,9 +75,33 @@ export interface SettingsState {
 const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 
 const PRESETS: Record<Quality, Partial<SettingsState>> = {
-  low: { renderScale: 0.6, shadows: false, antialias: false, postFx: false, renderDistance: 45, fogQuality: 'low', textureQuality: 'low' },
-  medium: { renderScale: 0.85, shadows: true, antialias: false, postFx: false, renderDistance: 70, fogQuality: 'high', textureQuality: 'high' },
-  high: { renderScale: 1, shadows: true, antialias: true, postFx: true, renderDistance: 110, fogQuality: 'high', textureQuality: 'high' },
+  low: {
+    renderScale: 0.6,
+    shadows: false,
+    antialias: false,
+    postFx: false,
+    renderDistance: 45,
+    fogQuality: 'low',
+    textureQuality: 'low',
+  },
+  medium: {
+    renderScale: 0.85,
+    shadows: true,
+    antialias: false,
+    postFx: false,
+    renderDistance: 70,
+    fogQuality: 'high',
+    textureQuality: 'high',
+  },
+  high: {
+    renderScale: 1,
+    shadows: true,
+    antialias: true,
+    postFx: true,
+    renderDistance: 110,
+    fogQuality: 'high',
+    textureQuality: 'high',
+  },
 };
 
 export const useSettings = create<SettingsState>()(

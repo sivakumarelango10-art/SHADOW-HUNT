@@ -76,14 +76,30 @@ function build(): MapDef {
   const circles: CircleObstacle[] = [];
   const rock = (x: number, z: number, r: number) => circles.push({ x, z, r, kind: 'rock', h: r * 1.3 });
   for (const [x, z, r] of [
-    [-14, -2, 1.8], [12, -18, 2.0], [-36, 14, 1.6], [26, 40, 2.2], [42, -18, 1.5], [-22, 42, 1.4], [8, 24, 1.3], [-44, -28, 1.7],
-  ] as const) rock(x, z, r);
+    [-14, -2, 1.8],
+    [12, -18, 2.0],
+    [-36, 14, 1.6],
+    [26, 40, 2.2],
+    [42, -18, 1.5],
+    [-22, 42, 1.4],
+    [8, 24, 1.3],
+    [-44, -28, 1.7],
+  ] as const)
+    rock(x, z, r);
 
   // Pallets flanked by rocks so each one is a real chokepoint.
   const pallets: PalletDef[] = [];
   const palletSpots: [number, number, 'x' | 'z'][] = [
-    [-12, -20, 'x'], [16, -12, 'z'], [-30, -4, 'z'], [24, 8, 'x'], [-14, 28, 'z'], [6, 32, 'x'], [-38, 22, 'x'], [38, -22, 'z'],
-    [-4, -38, 'x'], [40, 22, 'z'],
+    [-12, -20, 'x'],
+    [16, -12, 'z'],
+    [-30, -4, 'z'],
+    [24, 8, 'x'],
+    [-14, 28, 'z'],
+    [6, 32, 'x'],
+    [-38, 22, 'x'],
+    [38, -22, 'z'],
+    [-4, -38, 'x'],
+    [40, 22, 'z'],
   ];
   palletSpots.forEach(([x, z, axis], i) => {
     const len = 2.6;
@@ -111,32 +127,89 @@ function build(): MapDef {
 
   const lockers: LockerDef[] = (
     [
-      [-30.4, -22, Math.PI / 2], [28.4, 22.6, -Math.PI / 2], [-33.4, 27.6, Math.PI / 2], [31.4, -12.4, -Math.PI / 2],
-      [99.3, -6, -Math.PI / 2], [79, 12.4, Math.PI], [-44, 34, 0], [44, -6, -Math.PI / 2], [8, -44, 0], [-2, 28, Math.PI],
+      [-30.4, -22, Math.PI / 2],
+      [28.4, 22.6, -Math.PI / 2],
+      [-33.4, 27.6, Math.PI / 2],
+      [31.4, -12.4, -Math.PI / 2],
+      [99.3, -6, -Math.PI / 2],
+      [79, 12.4, Math.PI],
+      [-44, 34, 0],
+      [44, -6, -Math.PI / 2],
+      [8, -44, 0],
+      [-2, 28, Math.PI],
     ] as const
   ).map(([x, z, rot], i) => ({ id: `locker${i}`, x, z, rot }));
 
   const pickups: PickupDef[] = [
-    ...([[-29, -19.6], [24, 17.6], [29, -13], [81, -10], [-45, -20], [45, 30], [-10, 45], [20, -40]] as const).map(
-      ([x, z], i) => ({ id: `battery${i}`, kind: 'battery' as const, x, z }),
-    ),
-    ...([[26, 18], [-46, 45], [92, -12]] as const).map(([x, z], i) => ({ id: `medkit${i}`, kind: 'medkit' as const, x, z })),
-    ...([[-23, -19.5], [97, 12], [-28.5, 28]] as const).map(([x, z], i) => ({ id: `fire${i}`, kind: 'firecracker' as const, x, z })),
+    ...(
+      [
+        [-29, -19.6],
+        [24, 17.6],
+        [29, -13],
+        [81, -10],
+        [-45, -20],
+        [45, 30],
+        [-10, 45],
+        [20, -40],
+      ] as const
+    ).map(([x, z], i) => ({ id: `battery${i}`, kind: 'battery' as const, x, z })),
+    ...(
+      [
+        [26, 18],
+        [-46, 45],
+        [92, -12],
+      ] as const
+    ).map(([x, z], i) => ({ id: `medkit${i}`, kind: 'medkit' as const, x, z })),
+    ...(
+      [
+        [-23, -19.5],
+        [97, 12],
+        [-28.5, 28],
+      ] as const
+    ).map(([x, z], i) => ({ id: `fire${i}`, kind: 'firecracker' as const, x, z })),
   ];
 
   const keySpawns: Vec2[] = (
-    [[-23, -24], [24, 22.2], [-44, -44], [44, 44], [-14, -44], [96, -10], [-18, 24], [30, 0]] as const
+    [
+      [-23, -24],
+      [24, 22.2],
+      [-44, -44],
+      [44, 44],
+      [-14, -44],
+      [96, -10],
+      [-18, 24],
+      [30, 0],
+    ] as const
   ).map(([x, z]) => ({ x, z }));
 
-  const cages = ([[-14, -30], [20, -20], [-24, 4], [12, 12], [-6, 44], [34, 30], [95, 8]] as const).map(([x, z], i) => ({
+  const cages = (
+    [
+      [-14, -30],
+      [20, -20],
+      [-24, 4],
+      [12, 12],
+      [-6, 44],
+      [34, 30],
+      [95, 8],
+    ] as const
+  ).map(([x, z], i) => ({
     id: `cage${i}`,
     x,
     z,
   }));
 
-  const survivorSpawns: Vec2[] = ([[-4, -44], [0, -45], [4, -44], [-2, -42], [2, -42], [-6, -42], [6, -42], [0, -40]] as const).map(
-    ([x, z]) => ({ x, z }),
-  );
+  const survivorSpawns: Vec2[] = (
+    [
+      [-4, -44],
+      [0, -45],
+      [4, -44],
+      [-2, -42],
+      [2, -42],
+      [-6, -42],
+      [6, -42],
+      [0, -40],
+    ] as const
+  ).map(([x, z]) => ({ x, z }));
   const hunterSpawn = { x: 0, z: 42 };
 
   const exits = [
@@ -196,10 +269,21 @@ function build(): MapDef {
     decor.push({ kind: rng() < 0.7 ? 'grass' : 'fern', x, z, rot: rng() * Math.PI * 2, scale: 0.6 + rng() * 0.9 });
   }
   const add = (kind: DecorDef['kind'], x: number, z: number, rot = 0, scale = 1) => decor.push({ kind, x, z, rot, scale });
-  add('barrel', 1.5, 1.5); add('barrel', -1.5, -1.2, 1); add('tire', 9, 0, 0.4); add('tire', -37, -3, 2);
-  add('skull_pile', -14, -33); add('bones', 22, -22); add('bones', -24, 6); add('blood', 12, 14, 0, 1.2); add('blood', -6, 46, 1, 1);
-  add('sign', 5.5, 46, Math.PI); add('sign', -46, 16, Math.PI / 2); add('lamp_post', 4.5, 49); add('lamp_post', -49, 14.5);
-  add('barrel', 74, 10); add('barrel', 98, 2.5);
+  add('barrel', 1.5, 1.5);
+  add('barrel', -1.5, -1.2, 1);
+  add('tire', 9, 0, 0.4);
+  add('tire', -37, -3, 2);
+  add('skull_pile', -14, -33);
+  add('bones', 22, -22);
+  add('bones', -24, 6);
+  add('blood', 12, 14, 0, 1.2);
+  add('blood', -6, 46, 1, 1);
+  add('sign', 5.5, 46, Math.PI);
+  add('sign', -46, 16, Math.PI / 2);
+  add('lamp_post', 4.5, 49);
+  add('lamp_post', -49, 14.5);
+  add('barrel', 74, 10);
+  add('barrel', 98, 2.5);
 
   const lights: LightDef[] = [
     { x: 0, y: 1.4, z: 0, color: '#ff7a30', intensity: 9, distance: 16, flicker: 0.7 },
@@ -214,9 +298,39 @@ function build(): MapDef {
 
   const shadowPoints: Vec2[] = (
     [
-      [-40, -44], [-20, -44], [14, -44], [36, -46], [-46, -30], [-24, -32], [-4, -24], [22, -30], [44, -34], [-34, -16],
-      [-16, -8], [6, -14], [30, -18], [46, -8], [-44, 0], [-26, 0], [10, -4], [34, -2], [-34, 18], [-12, 20], [14, 18],
-      [36, 14], [-42, 40], [-26, 46], [8, 40], [30, 46], [46, 36], [-24, -21], [26, 21], [76, -10], [96, -6], [84, 8], [76, 10],
+      [-40, -44],
+      [-20, -44],
+      [14, -44],
+      [36, -46],
+      [-46, -30],
+      [-24, -32],
+      [-4, -24],
+      [22, -30],
+      [44, -34],
+      [-34, -16],
+      [-16, -8],
+      [6, -14],
+      [30, -18],
+      [46, -8],
+      [-44, 0],
+      [-26, 0],
+      [10, -4],
+      [34, -2],
+      [-34, 18],
+      [-12, 20],
+      [14, 18],
+      [36, 14],
+      [-42, 40],
+      [-26, 46],
+      [8, 40],
+      [30, 46],
+      [46, 36],
+      [-24, -21],
+      [26, 21],
+      [76, -10],
+      [96, -6],
+      [84, 8],
+      [76, 10],
     ] as const
   ).map(([x, z]) => ({ x, z }));
 
@@ -228,15 +342,75 @@ function build(): MapDef {
       'Dense pines, abandoned cabins and the wrecks of everyone who tried to drive through. Power the floodlights, find the gate keys and run for the road.',
     bounds: { minX: -60, maxX: 104, minZ: -54, maxZ: 60 },
     regions: [
-      { id: 'forest', name: 'Blackwood Forest', minX: -50, maxX: 50, minZ: -50, maxZ: 50, indoor: false, ceiling: 0, floor: 'forest' },
+      {
+        id: 'forest',
+        name: 'Blackwood Forest',
+        minX: -50,
+        maxX: 50,
+        minZ: -50,
+        maxZ: 50,
+        indoor: false,
+        ceiling: 0,
+        floor: 'forest',
+      },
       { id: 'vest_s', name: 'South Road', minX: -3.2, maxX: 3.2, minZ: 50, maxZ: 56, indoor: false, ceiling: 0, floor: 'gravel' },
-      { id: 'vest_w', name: 'Logging Road', minX: -56, maxX: -50, minZ: 6.8, maxZ: 13.2, indoor: false, ceiling: 0, floor: 'gravel' },
-      { id: 'cabinA', name: 'Hunter Cabin', minX: -31, maxX: -21, minZ: -26, maxZ: -18, indoor: true, ceiling: 3.0, floor: 'wood' },
+      {
+        id: 'vest_w',
+        name: 'Logging Road',
+        minX: -56,
+        maxX: -50,
+        minZ: 6.8,
+        maxZ: 13.2,
+        indoor: false,
+        ceiling: 0,
+        floor: 'gravel',
+      },
+      {
+        id: 'cabinA',
+        name: 'Hunter Cabin',
+        minX: -31,
+        maxX: -21,
+        minZ: -26,
+        maxZ: -18,
+        indoor: true,
+        ceiling: 3.0,
+        floor: 'wood',
+      },
       { id: 'cabinB', name: 'Lake Cabin', minX: 19, maxX: 29, minZ: 16, maxZ: 24, indoor: true, ceiling: 3.0, floor: 'wood' },
-      { id: 'cabinC', name: 'Ranger Station', minX: -34, maxX: -26, minZ: 26, maxZ: 34, indoor: true, ceiling: 3.0, floor: 'wood' },
+      {
+        id: 'cabinC',
+        name: 'Ranger Station',
+        minX: -34,
+        maxX: -26,
+        minZ: 26,
+        maxZ: 34,
+        indoor: true,
+        ceiling: 3.0,
+        floor: 'wood',
+      },
       { id: 'shed', name: 'Tool Shed', minX: 28, maxX: 32, minZ: -14, maxZ: -10, indoor: true, ceiling: 2.6, floor: 'wood' },
-      { id: 'hut', name: 'Bunker Hatch', minX: 36, maxX: 40, minZ: -42.2, maxZ: -38, indoor: true, ceiling: 2.4, floor: 'concrete' },
-      { id: 'bunker', name: 'Underground Bunker', minX: 70, maxX: 100, minZ: -14, maxZ: 14, indoor: true, ceiling: 3.0, floor: 'concrete' },
+      {
+        id: 'hut',
+        name: 'Bunker Hatch',
+        minX: 36,
+        maxX: 40,
+        minZ: -42.2,
+        maxZ: -38,
+        indoor: true,
+        ceiling: 2.4,
+        floor: 'concrete',
+      },
+      {
+        id: 'bunker',
+        name: 'Underground Bunker',
+        minX: 70,
+        maxX: 100,
+        minZ: -14,
+        maxZ: 14,
+        indoor: true,
+        ceiling: 3.0,
+        floor: 'concrete',
+      },
     ],
     boxes: b.boxes,
     circles,

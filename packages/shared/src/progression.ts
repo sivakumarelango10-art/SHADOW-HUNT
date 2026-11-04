@@ -54,8 +54,16 @@ export interface AchievementDef {
 
 export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'first_escape', name: 'First Escape', description: 'Escape a match as a survivor.' },
-  { id: 'silent_survivor', name: 'Silent Survivor', description: 'Escape without being hit and with under 10 seconds of sprinting.' },
-  { id: 'last_one_standing', name: 'Last One Standing', description: 'Be the only survivor to escape from a team of three or more.' },
+  {
+    id: 'silent_survivor',
+    name: 'Silent Survivor',
+    description: 'Escape without being hit and with under 10 seconds of sprinting.',
+  },
+  {
+    id: 'last_one_standing',
+    name: 'Last One Standing',
+    description: 'Be the only survivor to escape from a team of three or more.',
+  },
   { id: 'master_hunter', name: 'Master Hunter', description: 'Eliminate 10 survivors across all matches.' },
   { id: 'perfect_hunt', name: 'Perfect Hunt', description: 'Eliminate every survivor in a match with at least two survivors.' },
   { id: 'team_rescuer', name: 'Team Rescuer', description: 'Rescue two teammates in a single match.' },
@@ -138,7 +146,8 @@ export function unlocksBetween(levelBefore: number, levelAfter: number): string[
   for (const c of Object.values(CHARACTERS)) {
     if (c.unlockLevel > levelBefore && c.unlockLevel <= levelAfter) out.push(c.name);
     for (const sk of c.skins) {
-      if (sk.unlockLevel > levelBefore && sk.unlockLevel <= levelAfter && sk.unlockLevel > c.unlockLevel) out.push(`${c.name} — ${sk.name}`);
+      if (sk.unlockLevel > levelBefore && sk.unlockLevel <= levelAfter && sk.unlockLevel > c.unlockLevel)
+        out.push(`${c.name} — ${sk.name}`);
     }
   }
   for (const t of TITLES) if (t.level && t.level > levelBefore && t.level <= levelAfter) out.push(`Title: ${t.name}`);
@@ -168,7 +177,10 @@ export function isValidRoomCode(code: string): boolean {
 }
 
 export function normalizeRoomCode(raw: string): string {
-  return raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, ROOM_CODE_LENGTH);
+  return raw
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, ROOM_CODE_LENGTH);
 }
 
 export const USERNAME_RE = /^[A-Za-z0-9_]{3,16}$/;

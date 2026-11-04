@@ -258,10 +258,26 @@ export class Game {
 
   private interact(): InteractWorld {
     const w = this.interactWorld;
-    w.keys = [...this.state.keys.entries()].map(([id, k]) => ({ id, x: k.x, z: k.z, carriedBy: k.carriedBy, deposited: k.deposited }));
+    w.keys = [...this.state.keys.entries()].map(([id, k]) => ({
+      id,
+      x: k.x,
+      z: k.z,
+      carriedBy: k.carriedBy,
+      deposited: k.deposited,
+    }));
     w.players = this.players().map((p) => ({
-      id: p.sessionId, role: p.role as 'survivor' | 'hunter', characterId: p.characterId as never, condition: p.condition as Condition,
-      x: p.x, z: p.z, yaw: p.yaw, hiddenIn: p.hiddenIn, carryingKey: p.carryingKey, item: p.item, cageId: p.cageId, busy: p.action !== 'none',
+      id: p.sessionId,
+      role: p.role as 'survivor' | 'hunter',
+      characterId: p.characterId as never,
+      condition: p.condition as Condition,
+      x: p.x,
+      z: p.z,
+      yaw: p.yaw,
+      hiddenIn: p.hiddenIn,
+      carryingKey: p.carryingKey,
+      item: p.item,
+      cageId: p.cageId,
+      busy: p.action !== 'none',
     }));
     return w;
   }
@@ -1132,7 +1148,11 @@ export class Game {
       this.fx({ kind: 'firecracker', x, z, by: p.sessionId });
       this.noise(x, z, 'firecracker', NOISE.firecrackerRadius);
       const h = this.hunter();
-      if (h && Math.hypot(h.x - x, h.z - z) < ITEMS.firecrackerBlindRadius && hasLineOfSight(this.world, this.dyn, h.x, h.z, x, z)) {
+      if (
+        h &&
+        Math.hypot(h.x - x, h.z - z) < ITEMS.firecrackerBlindRadius &&
+        hasLineOfSight(this.world, this.dyn, h.x, h.z, x, z)
+      ) {
         const hrt = this.rt.get(h.sessionId)!;
         hrt.blindUntil = this.time + HUNTER.blindSeconds;
         this.stun(h, hrt, HUNTER.blindSeconds * 0.5);
@@ -1225,7 +1245,11 @@ export class Game {
     };
     rt.skill = check;
     this.room.send(p.sessionId, S2C.skillCheck, {
-      id: check.id, duration: check.duration, zoneStart: check.zoneStart, zoneEnd: check.zoneEnd, greatEnd: check.greatEnd,
+      id: check.id,
+      duration: check.duration,
+      zoneStart: check.zoneStart,
+      zoneEnd: check.zoneEnd,
+      greatEnd: check.greatEnd,
     });
   }
 

@@ -1,14 +1,7 @@
 export type Role = 'survivor' | 'hunter';
 
 /** Survivor state machine (see `stateMachine.ts`). Hunters stay `healthy`. */
-export type Condition =
-  | 'healthy'
-  | 'injured'
-  | 'downed'
-  | 'captured'
-  | 'rescued'
-  | 'escaped'
-  | 'eliminated';
+export type Condition = 'healthy' | 'injured' | 'downed' | 'captured' | 'rescued' | 'escaped' | 'eliminated';
 
 export type GamePhase = 'lobby' | 'countdown' | 'playing' | 'results';
 

@@ -135,7 +135,16 @@ export function GameController({ mapId }: { mapId: MapId }) {
         prediction.apply(
           world,
           dyn,
-          { seq: ++prediction.seq, dt: stepDt, mx: ax.mx, mz: ax.mz, yaw: L.yaw, pitch: L.pitch, sprint: input.sprinting(), crouch: input.crouching() },
+          {
+            seq: ++prediction.seq,
+            dt: stepDt,
+            mx: ax.mx,
+            mz: ax.mz,
+            yaw: L.yaw,
+            pitch: L.pitch,
+            sprint: input.sprinting(),
+            crouch: input.crouching(),
+          },
           me,
         );
       }
@@ -204,10 +213,12 @@ export function GameController({ mapId }: { mapId: MapId }) {
     // ---- Camera
     let camX = prediction.s.x + prediction.offset.x;
     let camZ = prediction.s.z + prediction.offset.z;
-    let targetEye: number = me.role === 'hunter' ? PLAYER.hunterEyeHeight : prediction.s.crouching ? PLAYER.crouchEyeHeight : PLAYER.eyeHeight;
+    let targetEye: number =
+      me.role === 'hunter' ? PLAYER.hunterEyeHeight : prediction.s.crouching ? PLAYER.crouchEyeHeight : PLAYER.eyeHeight;
     if (me.condition === 'downed') targetEye = PLAYER.downedEyeHeight;
     if (me.condition === 'captured') targetEye = 1.15;
-    if (['repair', 'rescue', 'revive', 'heal', 'pickup', 'pickupKey', 'selfheal'].includes(me.action) && me.role === 'survivor') targetEye = 1.2;
+    if (['repair', 'rescue', 'revive', 'heal', 'pickup', 'pickupKey', 'selfheal'].includes(me.action) && me.role === 'survivor')
+      targetEye = 1.2;
     let spectating: string | null = null;
     if (!alive) {
       const others: any[] = [];
@@ -272,7 +283,12 @@ export function GameController({ mapId }: { mapId: MapId }) {
         L.stepAcc = 0;
         const indoor = mapId === 'asylum';
         if (me.role === 'hunter') audio.play('step_heavy', 0.35);
-        else audio.play(indoor ? 'step_hard' : 'step_soft', prediction.s.crouching ? 0.12 : prediction.s.sprinting ? 0.5 : 0.28, 0.9 + Math.random() * 0.2);
+        else
+          audio.play(
+            indoor ? 'step_hard' : 'step_soft',
+            prediction.s.crouching ? 0.12 : prediction.s.sprinting ? 0.5 : 0.28,
+            0.9 + Math.random() * 0.2,
+          );
       }
     }
     let terror = 0;
@@ -286,7 +302,10 @@ export function GameController({ mapId }: { mapId: MapId }) {
         terror = Math.max(0, Math.min(1, 1 - d / radius));
       }
     }
-    audio.bed(mapId === 'asylum' ? 'ambient_asylum' : 'ambient_forest', phase === 'playing' || phase === 'countdown' ? 0.55 : 0.25);
+    audio.bed(
+      mapId === 'asylum' ? 'ambient_asylum' : 'ambient_forest',
+      phase === 'playing' || phase === 'countdown' ? 0.55 : 0.25,
+    );
     audio.bed('heartbeat', terror > 0 ? 0.25 + terror * 0.75 : 0, 0.75 + terror * 0.85);
     const chase = me.role === 'survivor' ? Math.max(0, Math.min(1, (terror - 0.45) / 0.35)) : 0;
     audio.bed('music_chase', playing ? chase * 0.7 : 0);
@@ -346,7 +365,15 @@ export function GameController({ mapId }: { mapId: MapId }) {
         shadow-camera-near={0.2}
         shadow-camera-far={30}
       />
-      <pointLight ref={hunterSight} color="#7a3030" intensity={6} distance={14} decay={1.2} position={[0, 0.3, 0]} visible={false} />
+      <pointLight
+        ref={hunterSight}
+        color="#7a3030"
+        intensity={6}
+        distance={14}
+        decay={1.2}
+        position={[0, 0.3, 0]}
+        visible={false}
+      />
     </>
   );
 }

@@ -145,12 +145,30 @@ export function MobileControls({ role, hasItem }: { role: 'survivor' | 'hunter';
   );
 }
 
-function Btn({ label, onPress, small, big, active, danger }: { label: ReactNode; onPress: () => void; small?: boolean; big?: boolean; active?: boolean; danger?: boolean }) {
+function Btn({
+  label,
+  onPress,
+  small,
+  big,
+  active,
+  danger,
+}: {
+  label: ReactNode;
+  onPress: () => void;
+  small?: boolean;
+  big?: boolean;
+  active?: boolean;
+  danger?: boolean;
+}) {
   const size = big ? 'h-20 w-20 text-sm' : small ? 'h-14 w-14 text-[10px]' : 'h-16 w-16 text-xs';
   return (
     <button
       className={`${size} rounded-full border font-semibold tracking-wider uppercase backdrop-blur-sm transition active:scale-95 ${
-        danger ? 'border-blood/80 bg-blood/40 text-white' : active ? 'border-bone/70 bg-bone/25 text-white' : 'border-white/25 bg-black/35 text-white/80'
+        danger
+          ? 'border-blood/80 bg-blood/40 text-white'
+          : active
+            ? 'border-bone/70 bg-bone/25 text-white'
+            : 'border-white/25 bg-black/35 text-white/80'
       }`}
       onTouchStart={(e) => {
         e.stopPropagation();

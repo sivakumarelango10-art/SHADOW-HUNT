@@ -28,11 +28,22 @@ export function Results({ results }: { results: MatchResults | null }) {
   const mins = `${Math.floor(results.durationSeconds / 60)}:${String(results.durationSeconds % 60).padStart(2, '0')}`;
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative z-10 flex h-full flex-col overflow-y-auto bg-black/60 backdrop-blur-sm">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="relative z-10 flex h-full flex-col overflow-y-auto bg-black/60 backdrop-blur-sm"
+    >
       <div className="mx-auto w-full max-w-5xl px-5 py-8 md:py-12">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center"
+        >
           <div className="label">{results.winner === 'survivors' ? 'The survivors escaped' : 'The hunter prevailed'}</div>
-          <h1 className={`heading mt-2 text-6xl md:text-7xl ${won ? 'text-bone' : 'text-blood'}`}>{won ? 'Victory' : 'Defeat'}</h1>
+          <h1 className={`heading mt-2 text-6xl md:text-7xl ${won ? 'text-bone' : 'text-blood'}`}>
+            {won ? 'Victory' : 'Defeat'}
+          </h1>
           <div className="mt-3 flex flex-wrap justify-center gap-4 text-sm text-ash">
             <span>Duration {mins}</span>
             <span>
@@ -62,7 +73,9 @@ export function Results({ results }: { results: MatchResults | null }) {
             {mine.levelAfter > mine.levelBefore && (
               <div className="mt-4 rounded-md border border-amber-300/30 bg-amber-300/5 p-3 text-sm text-amber-100">
                 Level up! {mine.levelBefore} → {mine.levelAfter}
-                {mine.unlocked.length > 0 && <div className="mt-1 text-xs text-amber-200/80">Unlocked: {mine.unlocked.join(', ')}</div>}
+                {mine.unlocked.length > 0 && (
+                  <div className="mt-1 text-xs text-amber-200/80">Unlocked: {mine.unlocked.join(', ')}</div>
+                )}
               </div>
             )}
             {mine.newAchievements.length > 0 && (

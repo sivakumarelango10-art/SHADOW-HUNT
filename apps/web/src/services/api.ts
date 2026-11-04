@@ -57,8 +57,12 @@ export const api = {
   health: () => request<{ ok: boolean; store: string }>('GET', '/api/health'),
   guest: (name?: string) => request<{ token: string; profile: Profile }>('POST', '/api/auth/guest', { name }),
   profile: () => request<{ profile: Profile }>('GET', '/api/profile'),
-  updateProfile: (patch: { username?: string; avatar?: string; title?: string; skin?: { characterId: string; skinId: string } }) =>
-    request<{ profile: Profile }>('PATCH', '/api/profile', patch),
+  updateProfile: (patch: {
+    username?: string;
+    avatar?: string;
+    title?: string;
+    skin?: { characterId: string; skinId: string };
+  }) => request<{ profile: Profile }>('PATCH', '/api/profile', patch),
   history: () => request<{ history: MatchHistoryEntry[] }>('GET', '/api/history'),
   friends: () => request<{ friends: FriendEntry[] }>('GET', '/api/friends'),
   addFriend: (username: string) => request<{ ok: boolean }>('POST', '/api/friends', { username }),

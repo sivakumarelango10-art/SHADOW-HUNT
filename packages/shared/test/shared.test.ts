@@ -37,7 +37,8 @@ describe('maps', () => {
     });
 
     it(`${id}: spawns are free of obstacles`, () => {
-      for (const s of map.survivorSpawns) expect(isFree(world, noDyn, s.x, s.z, PLAYER.survivorRadius), `${s.x},${s.z}`).toBe(true);
+      for (const s of map.survivorSpawns)
+        expect(isFree(world, noDyn, s.x, s.z, PLAYER.survivorRadius), `${s.x},${s.z}`).toBe(true);
       expect(isFree(world, noDyn, map.hunterSpawn.x, map.hunterSpawn.z, PLAYER.hunterRadius)).toBe(true);
     });
 
@@ -77,31 +78,52 @@ function mover(x: number, z: number): MoverState {
 
 describe('movement', () => {
   const world = buildStaticWorld(MAPS.asylum);
-  const params = { role: 'survivor' as const, condition: 'healthy' as const, characterId: 'alex' as const, speedMul: 1, locked: false };
+  const params = {
+    role: 'survivor' as const,
+    condition: 'healthy' as const,
+    characterId: 'alex' as const,
+    speedMul: 1,
+    locked: false,
+  };
 
   it('walks forward (-z at yaw 0) at walk speed', () => {
     const s = mover(0, 16);
-    for (let i = 0; i < 30; i++) stepMovement(world, noDyn, s, { seq: i, dt: 1 / 30, mx: 0, mz: 1, yaw: 0, pitch: 0, sprint: false, crouch: false }, params);
+    for (let i = 0; i < 30; i++)
+      stepMovement(world, noDyn, s, { seq: i, dt: 1 / 30, mx: 0, mz: 1, yaw: 0, pitch: 0, sprint: false, crouch: false }, params);
     expect(s.z).toBeCloseTo(16 - PLAYER.walkSpeed, 1);
     expect(s.x).toBeCloseTo(0, 5);
   });
 
   it('cannot pass through the outer wall', () => {
     const s = mover(-42, 8);
-    for (let i = 0; i < 120; i++) stepMovement(world, noDyn, s, { seq: i, dt: 1 / 30, mx: -1, mz: 0, yaw: 0, pitch: 0, sprint: true, crouch: false }, params);
+    for (let i = 0; i < 120; i++)
+      stepMovement(world, noDyn, s, { seq: i, dt: 1 / 30, mx: -1, mz: 0, yaw: 0, pitch: 0, sprint: true, crouch: false }, params);
     expect(s.x).toBeGreaterThan(-44);
   });
 
   it('sprinting drains stamina until exhausted', () => {
     const s = mover(0, 20);
-    for (let i = 0; i < 300; i++) stepMovement(world, noDyn, s, { seq: i, dt: 1 / 30, mx: 0, mz: i % 60 < 30 ? 1 : -1, yaw: 0, pitch: 0, sprint: true, crouch: false }, params);
+    for (let i = 0; i < 300; i++)
+      stepMovement(
+        world,
+        noDyn,
+        s,
+        { seq: i, dt: 1 / 30, mx: 0, mz: i % 60 < 30 ? 1 : -1, yaw: 0, pitch: 0, sprint: true, crouch: false },
+        params,
+      );
     expect(s.stamina).toBeLessThan(100);
     expect(s.exhausted || s.stamina < 50).toBe(true);
   });
 
   it('locked players do not move', () => {
     const s = mover(0, 16);
-    stepMovement(world, noDyn, s, { seq: 1, dt: 0.1, mx: 0, mz: 1, yaw: 0, pitch: 0, sprint: false, crouch: false }, { ...params, locked: true });
+    stepMovement(
+      world,
+      noDyn,
+      s,
+      { seq: 1, dt: 0.1, mx: 0, mz: 1, yaw: 0, pitch: 0, sprint: false, crouch: false },
+      { ...params, locked: true },
+    );
     expect(s.z).toBe(16);
   });
 });
@@ -155,8 +177,18 @@ describe('interactions', () => {
     lockerOccupied: () => false,
   };
   const me = {
-    id: 'a', role: 'survivor' as const, characterId: 'alex' as const, condition: 'healthy' as const,
-    x: gen.x + 1.2, z: gen.z, yaw: Math.PI / 2, hiddenIn: '', carryingKey: false, item: '', cageId: '', busy: false,
+    id: 'a',
+    role: 'survivor' as const,
+    characterId: 'alex' as const,
+    condition: 'healthy' as const,
+    x: gen.x + 1.2,
+    z: gen.z,
+    yaw: Math.PI / 2,
+    hiddenIn: '',
+    carryingKey: false,
+    item: '',
+    cageId: '',
+    busy: false,
   };
   it('offers generator repair when close and facing', () => {
     const opts = getInteractions(world, me);

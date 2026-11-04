@@ -55,7 +55,14 @@ export function HorrorEvents({ map }: { map: MapDef }) {
       // Vanish early if the player gets close.
       if (ud.t > 2.8 || figure.position.distanceTo(camera.position) < 12) figure.visible = false;
     }
-    if (!s || s.phase !== 'playing' || !me || me.role !== 'survivor' || me.condition !== 'healthy' && me.condition !== 'injured') return;
+    if (
+      !s ||
+      s.phase !== 'playing' ||
+      !me ||
+      me.role !== 'survivor' ||
+      (me.condition !== 'healthy' && me.condition !== 'injured')
+    )
+      return;
     const now = performance.now();
     if (now < next.current) return;
     next.current = now + 45000 + Math.random() * 50000;

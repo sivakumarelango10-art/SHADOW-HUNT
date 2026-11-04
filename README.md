@@ -6,6 +6,14 @@ A browser-based, real-time multiplayer asymmetric horror game. One Hunter versus
 
 The server is authoritative. Clients only send inputs and intents. Movement, hits, captures, objectives, timers, results and XP are all simulated and validated on the Colyseus server.
 
+| Menu | Lobby | Hunter view (forest) |
+|---|---|---|
+| ![](docs/screenshots/menu.png) | ![](docs/screenshots/lobby.png) | ![](docs/screenshots/forest-hunter.png) |
+| **Asylum, flashlight** | **Phone (landscape)** | |
+| ![](docs/screenshots/asylum.png) | ![](docs/screenshots/mobile.png) | |
+
+_Screenshots are from the automated e2e run (headless Chrome, software-rendered, low preset)._
+
 ---
 
 ## Quick start (local)

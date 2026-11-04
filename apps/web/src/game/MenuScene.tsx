@@ -31,12 +31,19 @@ function Forest() {
       trunks.setMatrixAt(i, m);
       for (let l = 0; l < 3; l++) {
         const f = l / 3;
-        m.compose(new THREE.Vector3(x, h * 0.28 + f * h * 0.55, z), q, new THREE.Vector3((3 - f * 2) * (0.8 + r), h * 0.4, (3 - f * 2) * (0.8 + r)));
+        m.compose(
+          new THREE.Vector3(x, h * 0.28 + f * h * 0.55, z),
+          q,
+          new THREE.Vector3((3 - f * 2) * (0.8 + r), h * 0.4, (3 - f * 2) * (0.8 + r)),
+        );
         cones.setMatrixAt(i * 3 + l, m);
       }
     }
     g.add(trunks, cones);
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ map: tex.forestFloor(), color: '#9a9a9a', roughness: 1 }));
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(200, 200),
+      new THREE.MeshStandardMaterial({ map: tex.forestFloor(), color: '#9a9a9a', roughness: 1 }),
+    );
     (ground.material as THREE.MeshStandardMaterial).map!.repeat.set(30, 30);
     ground.rotation.x = -Math.PI / 2;
     g.add(ground);
@@ -48,7 +55,21 @@ function Forest() {
 function Watcher({ id }: { id: CharacterId }) {
   const rig = useMemo(() => createRig(id, 'default', false), [id]);
   useEffect(() => () => rig.dispose(), [rig]);
-  const pose = useMemo<Pose>(() => ({ speed: 0, crouching: false, sprinting: false, condition: 'healthy', action: 'none', attackSeq: 0, hitSeq: 0, pitch: 0, carryingKey: false, flashlight: false }), []);
+  const pose = useMemo<Pose>(
+    () => ({
+      speed: 0,
+      crouching: false,
+      sprinting: false,
+      condition: 'healthy',
+      action: 'none',
+      attackSeq: 0,
+      hitSeq: 0,
+      pitch: 0,
+      carryingKey: false,
+      flashlight: false,
+    }),
+    [],
+  );
   useFrame((st, dt) => {
     rig.root.position.set(4.5, 0, -16);
     rig.root.rotation.y = Math.atan2(4.5, 16) * 0.6 + Math.sin(st.clock.elapsedTime * 0.3) * 0.15;
@@ -73,7 +94,12 @@ function Drift() {
 
 export function MenuScene({ hunter = 'wraith' }: { hunter?: CharacterId }) {
   return (
-    <Canvas dpr={[0.75, 1.25]} camera={{ fov: 60, near: 0.1, far: 120 }} gl={{ antialias: false, powerPreference: 'low-power' }} style={{ position: 'absolute', inset: 0 }}>
+    <Canvas
+      dpr={[0.75, 1.25]}
+      camera={{ fov: 60, near: 0.1, far: 120 }}
+      gl={{ antialias: false, powerPreference: 'low-power' }}
+      style={{ position: 'absolute', inset: 0 }}
+    >
       <Drift />
       <ambientLight color="#3a4a66" intensity={0.9} />
       <directionalLight color="#b4c6e2" intensity={1.6} position={[-20, 30, -10]} />

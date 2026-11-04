@@ -29,7 +29,18 @@ function Viewmodel({ characterId, skinId }: { characterId: CharacterId; skinId: 
   const rig = useMemo(() => createRig(characterId, skinId, false), [characterId, skinId]);
   const holder = useMemo(() => new THREE.Group(), []);
   const pose = useMemo<Pose>(
-    () => ({ speed: 0, crouching: false, sprinting: false, condition: 'healthy', action: 'none', attackSeq: 0, hitSeq: 0, pitch: 0, carryingKey: false, flashlight: true }),
+    () => ({
+      speed: 0,
+      crouching: false,
+      sprinting: false,
+      condition: 'healthy',
+      action: 'none',
+      attackSeq: 0,
+      hitSeq: 0,
+      pitch: 0,
+      carryingKey: false,
+      flashlight: true,
+    }),
     [],
   );
   useEffect(() => {
@@ -61,7 +72,12 @@ function Viewmodel({ characterId, skinId }: { characterId: CharacterId; skinId: 
     const r = currentRoom();
     const me = (r?.state as any)?.players?.get(r?.sessionId);
     if (!me) return;
-    const alive = me.condition !== 'escaped' && me.condition !== 'eliminated' && me.condition !== 'downed' && me.condition !== 'captured' && !me.hiddenIn;
+    const alive =
+      me.condition !== 'escaped' &&
+      me.condition !== 'eliminated' &&
+      me.condition !== 'downed' &&
+      me.condition !== 'captured' &&
+      !me.hiddenIn;
     holder.visible = alive && (me.role === 'hunter' || me.flashlight);
     if (swing.seq !== me.attackSeq) {
       if (swing.seq !== -1) swing.t = 0.4;
@@ -94,7 +110,12 @@ function PostFx() {
   return (
     <EffectComposer multisampling={0}>
       <Bloom intensity={0.7} luminanceThreshold={0.55} luminanceSmoothing={0.3} mipmapBlur />
-      <ChromaticAberration offset={new THREE.Vector2(0.0006 + terror * 0.002, 0.0004)} blendFunction={BlendFunction.NORMAL} radialModulation={false} modulationOffset={0} />
+      <ChromaticAberration
+        offset={new THREE.Vector2(0.0006 + terror * 0.002, 0.0004)}
+        blendFunction={BlendFunction.NORMAL}
+        radialModulation={false}
+        modulationOffset={0}
+      />
       <Noise opacity={0.06} blendFunction={BlendFunction.OVERLAY} />
       <Vignette eskil={false} offset={0.25} darkness={0.75 + terror * 0.2} />
     </EffectComposer>
@@ -105,7 +126,7 @@ export function GameWorld({ mapId, characterId, skinId }: { mapId: MapId; charac
   const s = useSettings();
   const map = MAPS[mapId];
   setTextureQuality(s.textureQuality === 'low');
-  const role = (characterId === 'wraith' || characterId === 'butcher' || characterId === 'hollow') ? 'hunter' : 'survivor';
+  const role = characterId === 'wraith' || characterId === 'butcher' || characterId === 'hollow' ? 'hunter' : 'survivor';
   const dpr = Math.min(2, (typeof window !== 'undefined' ? window.devicePixelRatio : 1) * s.renderScale);
   return (
     <Canvas

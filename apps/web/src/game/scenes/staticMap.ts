@@ -19,14 +19,73 @@ const newArrays = (): Arrays => ({ pos: [], nor: [], uv: [], idx: [] });
 
 /** Box with world-space UVs so textures tile at a constant physical size. */
 function appendBox(a: Arrays, cx: number, cy: number, cz: number, w: number, h: number, d: number, uvScale: number, vSpan = 0) {
-  const x0 = cx - w / 2, x1 = cx + w / 2, y0 = cy, y1 = cy + h, z0 = cz - d / 2, z1 = cz + d / 2;
+  const x0 = cx - w / 2,
+    x1 = cx + w / 2,
+    y0 = cy,
+    y1 = cy + h,
+    z0 = cz - d / 2,
+    z1 = cz + d / 2;
   const faces: [number[][], number[], (p: number[]) => [number, number]][] = [
-    [[[x1, y0, z1], [x1, y0, z0], [x1, y1, z0], [x1, y1, z1]], [1, 0, 0], (p) => [-p[2]! / uvScale, vy(p[1]!)]],
-    [[[x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [x0, y1, z0]], [-1, 0, 0], (p) => [p[2]! / uvScale, vy(p[1]!)]],
-    [[[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], [0, 0, 1], (p) => [p[0]! / uvScale, vy(p[1]!)]],
-    [[[x1, y0, z0], [x0, y0, z0], [x0, y1, z0], [x1, y1, z0]], [0, 0, -1], (p) => [-p[0]! / uvScale, vy(p[1]!)]],
-    [[[x0, y1, z1], [x1, y1, z1], [x1, y1, z0], [x0, y1, z0]], [0, 1, 0], (p) => [p[0]! / uvScale, p[2]! / uvScale]],
-    [[[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]], [0, -1, 0], (p) => [p[0]! / uvScale, p[2]! / uvScale]],
+    [
+      [
+        [x1, y0, z1],
+        [x1, y0, z0],
+        [x1, y1, z0],
+        [x1, y1, z1],
+      ],
+      [1, 0, 0],
+      (p) => [-p[2]! / uvScale, vy(p[1]!)],
+    ],
+    [
+      [
+        [x0, y0, z0],
+        [x0, y0, z1],
+        [x0, y1, z1],
+        [x0, y1, z0],
+      ],
+      [-1, 0, 0],
+      (p) => [p[2]! / uvScale, vy(p[1]!)],
+    ],
+    [
+      [
+        [x0, y0, z1],
+        [x1, y0, z1],
+        [x1, y1, z1],
+        [x0, y1, z1],
+      ],
+      [0, 0, 1],
+      (p) => [p[0]! / uvScale, vy(p[1]!)],
+    ],
+    [
+      [
+        [x1, y0, z0],
+        [x0, y0, z0],
+        [x0, y1, z0],
+        [x1, y1, z0],
+      ],
+      [0, 0, -1],
+      (p) => [-p[0]! / uvScale, vy(p[1]!)],
+    ],
+    [
+      [
+        [x0, y1, z1],
+        [x1, y1, z1],
+        [x1, y1, z0],
+        [x0, y1, z0],
+      ],
+      [0, 1, 0],
+      (p) => [p[0]! / uvScale, p[2]! / uvScale],
+    ],
+    [
+      [
+        [x0, y0, z0],
+        [x1, y0, z0],
+        [x1, y0, z1],
+        [x0, y0, z1],
+      ],
+      [0, -1, 0],
+      (p) => [p[0]! / uvScale, p[2]! / uvScale],
+    ],
   ];
   function vy(y: number) {
     return vSpan ? y / vSpan : y / uvScale;
@@ -144,7 +203,8 @@ export function buildStaticMap(map: MapDef, opts: { shadows: boolean; detail: 'l
   for (const e of map.exits) {
     const along = e.gate.w > e.gate.d ? 'x' : 'z';
     const half = (along === 'x' ? e.gate.w : e.gate.d) / 2 + 0.25;
-    const post = (dx: number, dz: number) => put(M.concrete, { x: e.gate.x + dx, z: e.gate.z + dz, w: 0.5, d: 0.5, h: e.gate.h + 0.6, kind: 'concrete' }, 1);
+    const post = (dx: number, dz: number) =>
+      put(M.concrete, { x: e.gate.x + dx, z: e.gate.z + dz, w: 0.5, d: 0.5, h: e.gate.h + 0.6, kind: 'concrete' }, 1);
     if (along === 'x') {
       post(-half, 0);
       post(half, 0);
@@ -169,7 +229,12 @@ export function buildStaticMap(map: MapDef, opts: { shadows: boolean; detail: 'l
     const L = alongZ ? v.d : v.w;
     const W = alongZ ? v.w : v.d;
     const body = track(new THREE.BoxGeometry(W, v.h * 0.55, L));
-    const paint = track(std(tex.metal(), v.kind === 'vehicle_bus' ? '#8a7a3a' : v.kind === 'vehicle_truck' ? '#4a5a62' : '#5a2a28', { metalness: 0.35, roughness: 0.6 }));
+    const paint = track(
+      std(tex.metal(), v.kind === 'vehicle_bus' ? '#8a7a3a' : v.kind === 'vehicle_truck' ? '#4a5a62' : '#5a2a28', {
+        metalness: 0.35,
+        roughness: 0.6,
+      }),
+    );
     const b = new THREE.Mesh(body, paint);
     b.position.y = v.h * 0.25 + 0.3;
     b.rotation.z = (rnd() - 0.5) * 0.06;
@@ -372,7 +437,15 @@ export function buildStaticMap(map: MapDef, opts: { shadows: boolean; detail: 'l
     blade.translate(0, 0.35, 0);
     const b2 = blade.clone().rotateY(Math.PI / 2);
     const merged = track(mergeGeometries([blade, b2])!);
-    const gm = track(new THREE.MeshStandardMaterial({ map: tex.grassBlade(), alphaTest: 0.4, side: THREE.DoubleSide, roughness: 1, color: '#8a9a7a' }));
+    const gm = track(
+      new THREE.MeshStandardMaterial({
+        map: tex.grassBlade(),
+        alphaTest: 0.4,
+        side: THREE.DoubleSide,
+        roughness: 1,
+        color: '#8a9a7a',
+      }),
+    );
     const inst = new THREE.InstancedMesh(merged, gm, count);
     for (let i = 0; i < count; i++) {
       const d = grass[i]!;
@@ -386,7 +459,16 @@ export function buildStaticMap(map: MapDef, opts: { shadows: boolean; detail: 'l
   }
 
   const decoMat = {
-    blood: track(new THREE.MeshStandardMaterial({ map: tex.blood(), transparent: true, depthWrite: false, roughness: 0.25, polygonOffset: true, polygonOffsetFactor: -2 })),
+    blood: track(
+      new THREE.MeshStandardMaterial({
+        map: tex.blood(),
+        transparent: true,
+        depthWrite: false,
+        roughness: 0.25,
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+      }),
+    ),
     paper: track(std(tex.paper(), '#9a9588')),
   };
   const barrelG = track(new THREE.CylinderGeometry(0.32, 0.32, 0.9, 14));
@@ -432,7 +514,12 @@ export function buildStaticMap(map: MapDef, opts: { shadows: boolean; detail: 'l
             g.add(w);
           }
         } else {
-          for (const [x, z] of [[-0.22, -0.22], [0.22, -0.22], [-0.22, 0.22], [0.22, 0.22]] as const) {
+          for (const [x, z] of [
+            [-0.22, -0.22],
+            [0.22, -0.22],
+            [-0.22, 0.22],
+            [0.22, 0.22],
+          ] as const) {
             const leg = new THREE.Mesh(track(new THREE.BoxGeometry(0.04, 0.48, 0.04)), M.wood);
             leg.position.set(x, 0.24, z);
             g.add(leg);
@@ -447,7 +534,10 @@ export function buildStaticMap(map: MapDef, opts: { shadows: boolean; detail: 'l
         const g = new THREE.Group();
         const pole = new THREE.Mesh(track(new THREE.CylinderGeometry(0.015, 0.015, 1.8, 6)), M.metal);
         pole.position.y = 0.9;
-        const bag = new THREE.Mesh(track(new THREE.BoxGeometry(0.12, 0.2, 0.04)), track(std(null, '#7a2a2a', { transparent: true, opacity: 0.8 })));
+        const bag = new THREE.Mesh(
+          track(new THREE.BoxGeometry(0.12, 0.2, 0.04)),
+          track(std(null, '#7a2a2a', { transparent: true, opacity: 0.8 })),
+        );
         bag.position.set(0.08, 1.6, 0);
         g.add(pole, bag);
         g.position.set(d.x, 0, d.z);
@@ -520,7 +610,10 @@ export function buildStaticMap(map: MapDef, opts: { shadows: boolean; detail: 'l
 
   // Bulbs for every light position (cheap emissive glow, real lights come from the pool).
   for (const l of map.lights) {
-    const bulb = new THREE.Mesh(track(new THREE.SphereGeometry(0.09, 8, 6)), track(new THREE.MeshBasicMaterial({ color: l.color })));
+    const bulb = new THREE.Mesh(
+      track(new THREE.SphereGeometry(0.09, 8, 6)),
+      track(new THREE.MeshBasicMaterial({ color: l.color })),
+    );
     bulb.position.set(l.x, l.y, l.z);
     bulb.userData.light = l;
     bulb.name = 'bulb';

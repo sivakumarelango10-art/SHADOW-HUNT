@@ -16,7 +16,17 @@ import {
  * the server has not processed yet. Any residual error is blended out visually.
  */
 export const prediction = {
-  s: { x: 0, z: 0, yaw: 0, pitch: 0, stamina: 100, exhausted: false, staminaDelay: 0, crouching: false, sprinting: false } as MoverState,
+  s: {
+    x: 0,
+    z: 0,
+    yaw: 0,
+    pitch: 0,
+    stamina: 100,
+    exhausted: false,
+    staminaDelay: 0,
+    crouching: false,
+    sprinting: false,
+  } as MoverState,
   seq: 0,
   pending: [] as MoveInput[],
   outbox: [] as MoveInput[],
@@ -26,7 +36,17 @@ export const prediction = {
   ready: false,
 
   reset(x: number, z: number, yaw: number) {
-    Object.assign(this.s, { x, z, yaw, pitch: 0, stamina: 100, exhausted: false, staminaDelay: 0, crouching: false, sprinting: false });
+    Object.assign(this.s, {
+      x,
+      z,
+      yaw,
+      pitch: 0,
+      stamina: 100,
+      exhausted: false,
+      staminaDelay: 0,
+      crouching: false,
+      sprinting: false,
+    });
     this.pending = [];
     this.outbox = [];
     this.offset.x = this.offset.z = 0;

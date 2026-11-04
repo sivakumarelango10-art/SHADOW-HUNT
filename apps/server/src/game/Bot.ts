@@ -75,7 +75,11 @@ export class BotController {
     if (d > range) return false;
     const ang = Math.abs(angleDiff(yawTowards(me.x, me.z, s.x, s.z), me.yaw));
     if (d > 5 && ang > 1.15) return false;
-    return hasLineOfSight(this.game.world, this.game.dyn, me.x, me.z, s.x, s.z, { minHeight: 1.3, includeCircles: true, minCircleRadius: 0.8 });
+    return hasLineOfSight(this.game.world, this.game.dyn, me.x, me.z, s.x, s.z, {
+      minHeight: 1.3,
+      includeCircles: true,
+      minCircleRadius: 0.8,
+    });
   }
 
   update(dt: number) {
@@ -180,9 +184,7 @@ export class BotController {
       const m = this.memory;
       this.goal = { x: m.x, z: m.z };
       if (Math.hypot(m.x - me.x, m.z - me.z) < 1.8) {
-        const locker = game.map.lockers.find(
-          (l) => Math.hypot(l.x - me.x, l.z - me.z) < 2.2 && !this.searchedLockers.has(l.id),
-        );
+        const locker = game.map.lockers.find((l) => Math.hypot(l.x - me.x, l.z - me.z) < 2.2 && !this.searchedLockers.has(l.id));
         if (locker && Math.random() < 0.6) {
           this.searchedLockers.add(locker.id);
           this.face(me, locker.x, locker.z);
@@ -226,13 +228,17 @@ export class BotController {
 
   private unstick(me: { x: number; z: number; yaw: number }) {
     const game = this.game;
-    const door = game.map.doors.find((d) => Math.hypot(d.x - me.x, d.z - me.z) < 2.4 && game.state.doors.get(d.id)?.open === false);
+    const door = game.map.doors.find(
+      (d) => Math.hypot(d.x - me.x, d.z - me.z) < 2.4 && game.state.doors.get(d.id)?.open === false,
+    );
     if (door && !game.state.doors.get(door.id)?.locked) {
       this.face(me, door.x, door.z);
       game.requestInteract(this.id, 'door', door.id);
       return;
     }
-    const pallet = game.map.pallets.find((p) => Math.hypot(p.x - me.x, p.z - me.z) < 2.6 && game.state.pallets.get(p.id) === 'down');
+    const pallet = game.map.pallets.find(
+      (p) => Math.hypot(p.x - me.x, p.z - me.z) < 2.6 && game.state.pallets.get(p.id) === 'down',
+    );
     if (pallet) {
       this.face(me, pallet.x, pallet.z);
       game.requestInteract(this.id, 'break', pallet.id);

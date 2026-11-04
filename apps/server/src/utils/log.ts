@@ -8,7 +8,9 @@ function emit(level: 'info' | 'warn' | 'error' | 'debug', msg: string, data?: Re
   if (prod) {
     console[level === 'debug' ? 'log' : level](JSON.stringify({ t: new Date().toISOString(), level, msg, ...data }));
   } else {
-    const tag = { info: '\x1b[36minfo\x1b[0m', warn: '\x1b[33mwarn\x1b[0m', error: '\x1b[31merror\x1b[0m', debug: 'debug' }[level];
+    const tag = { info: '\x1b[36minfo\x1b[0m', warn: '\x1b[33mwarn\x1b[0m', error: '\x1b[31merror\x1b[0m', debug: 'debug' }[
+      level
+    ];
     console[level === 'debug' ? 'log' : level](`${tag} ${msg}`, data ? JSON.stringify(data) : '');
   }
 }

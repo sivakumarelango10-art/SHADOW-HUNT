@@ -38,7 +38,16 @@ function hash(s: string) {
   return h >>> 0;
 }
 
-function speckle(ctx: CanvasRenderingContext2D, size: number, rnd: () => number, n: number, colors: string[], rMin: number, rMax: number, alpha = 0.5) {
+function speckle(
+  ctx: CanvasRenderingContext2D,
+  size: number,
+  rnd: () => number,
+  n: number,
+  colors: string[],
+  rMin: number,
+  rMax: number,
+  alpha = 0.5,
+) {
   for (let i = 0; i < n; i++) {
     ctx.globalAlpha = alpha * rnd();
     ctx.fillStyle = colors[Math.floor(rnd() * colors.length)]!;
@@ -79,11 +88,15 @@ export const tex = {
       ctx.globalAlpha = 1;
     }),
   forestRough: () =>
-    make('forestRough', (ctx, s, r) => {
-      ctx.fillStyle = '#e0e0e0';
-      ctx.fillRect(0, 0, s, s);
-      speckle(ctx, s, r, 40, ['#404040', '#606060'], s * 0.04, s * 0.12, 0.6); // wet puddles
-    }, { color: false }),
+    make(
+      'forestRough',
+      (ctx, s, r) => {
+        ctx.fillStyle = '#e0e0e0';
+        ctx.fillRect(0, 0, s, s);
+        speckle(ctx, s, r, 40, ['#404040', '#606060'], s * 0.04, s * 0.12, 0.6); // wet puddles
+      },
+      { color: false },
+    ),
   gravel: () =>
     make('gravel', (ctx, s, r) => {
       ctx.fillStyle = '#26272a';
@@ -115,11 +128,15 @@ export const tex = {
       speckle(ctx, s, r, 1500, ['#000000', '#6a6a60'], 0.5, 2, 0.4);
     }),
   tileRough: () =>
-    make('tileRough', (ctx, s, r) => {
-      ctx.fillStyle = '#909090';
-      ctx.fillRect(0, 0, s, s);
-      speckle(ctx, s, r, 30, ['#202020', '#353535'], s * 0.05, s * 0.14, 0.7);
-    }, { color: false }),
+    make(
+      'tileRough',
+      (ctx, s, r) => {
+        ctx.fillStyle = '#909090';
+        ctx.fillRect(0, 0, s, s);
+        speckle(ctx, s, r, 30, ['#202020', '#353535'], s * 0.05, s * 0.14, 0.7);
+      },
+      { color: false },
+    ),
   asylumWall: () =>
     make('asylumWall', (ctx, s, r) => {
       // upper plaster, lower tiled wainscot
@@ -274,11 +291,15 @@ export const tex = {
       ctx.fillRect(0, 0, s, s);
     }),
   beam: () =>
-    make('beam', (ctx, s) => {
-      const g = ctx.createLinearGradient(0, 0, 0, s);
-      g.addColorStop(0, 'rgba(255,255,255,0.9)');
-      g.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, s, s);
-    }, { color: false }),
+    make(
+      'beam',
+      (ctx, s) => {
+        const g = ctx.createLinearGradient(0, 0, 0, s);
+        g.addColorStop(0, 'rgba(255,255,255,0.9)');
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, s, s);
+      },
+      { color: false },
+    ),
 };

@@ -1,16 +1,7 @@
 import { useSettings, type Action } from '../../stores/settings';
 
 export type OneShot =
-  | 'attack'
-  | 'ability'
-  | 'roar'
-  | 'flashlight'
-  | 'item'
-  | 'interactDown'
-  | 'interactUp'
-  | 'skill'
-  | 'pause'
-  | 'spectateNext';
+  'attack' | 'ability' | 'roar' | 'flashlight' | 'item' | 'interactDown' | 'interactUp' | 'skill' | 'pause' | 'spectateNext';
 
 /**
  * Unified input state for keyboard/mouse and touch. The game loop reads axes every

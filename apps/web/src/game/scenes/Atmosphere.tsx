@@ -45,9 +45,21 @@ export function Atmosphere({ map, role }: { map: MapDef; role: string }) {
     }
     const sg = new THREE.BufferGeometry();
     sg.setAttribute('position', new THREE.BufferAttribute(p, 3));
-    const stars = new THREE.Points(sg, new THREE.PointsMaterial({ color: '#c8d4e8', size: 1.2, sizeAttenuation: false, fog: false, transparent: true, opacity: 0.8 }));
+    const stars = new THREE.Points(
+      sg,
+      new THREE.PointsMaterial({
+        color: '#c8d4e8',
+        size: 1.2,
+        sizeAttenuation: false,
+        fog: false,
+        transparent: true,
+        opacity: 0.8,
+      }),
+    );
     g.add(stars);
-    const moonSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex.glow(), color: '#dfe8ff', fog: false, transparent: true, depthWrite: false }));
+    const moonSprite = new THREE.Sprite(
+      new THREE.SpriteMaterial({ map: tex.glow(), color: '#dfe8ff', fog: false, transparent: true, depthWrite: false }),
+    );
     const dir = new THREE.Vector3(...a.moonDir).normalize().multiplyScalar(-380);
     moonSprite.position.copy(dir);
     moonSprite.scale.setScalar(60);
@@ -80,10 +92,13 @@ export function Atmosphere({ map, role }: { map: MapDef; role: string }) {
     pts.frustumCulled = false;
     return pts;
   }, [quality, map.id]);
-  useEffect(() => () => {
-    motes.geometry.dispose();
-    (motes.material as THREE.Material).dispose();
-  }, [motes]);
+  useEffect(
+    () => () => {
+      motes.geometry.dispose();
+      (motes.material as THREE.Material).dispose();
+    },
+    [motes],
+  );
 
   const assigned = useRef<number[]>([]);
   const t = useRef(0);
@@ -105,7 +120,8 @@ export function Atmosphere({ map, role }: { map: MapDef; role: string }) {
     const cz = camera.position.z;
     const region = regionAt(map, cx, cz);
     const indoor = !!region?.indoor;
-    const fogTarget = (indoor ? a.indoorFogDensity : a.fogDensity) * (fogQuality === 'low' ? 0.85 : 1) * (role === 'hunter' ? 0.8 : 1);
+    const fogTarget =
+      (indoor ? a.indoorFogDensity : a.fogDensity) * (fogQuality === 'low' ? 0.85 : 1) * (role === 'hunter' ? 0.8 : 1);
     fog.density += (fogTarget - fog.density) * Math.min(1, dt * 2);
     if (role === 'hunter') fog.color.lerp(new THREE.Color(a.hunterTint), 0.05);
 
@@ -113,7 +129,8 @@ export function Atmosphere({ map, role }: { map: MapDef; role: string }) {
       moon.current.position.set(cx - a.moonDir[0] * 40, 60, cz - a.moonDir[2] * 40);
       moon.current.target.position.set(cx, 0, cz);
       moon.current.target.updateMatrixWorld();
-      moon.current.intensity += ((indoor ? a.moonIntensity * 0.25 : a.moonIntensity) - moon.current.intensity) * Math.min(1, dt * 2);
+      moon.current.intensity +=
+        ((indoor ? a.moonIntensity * 0.25 : a.moonIntensity) - moon.current.intensity) * Math.min(1, dt * 2);
     }
     if (ambient.current) ambient.current.intensity = a.ambientIntensity * (role === 'hunter' ? 1.6 : 1) * (powerOn ? 1.15 : 1);
 

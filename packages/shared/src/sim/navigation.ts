@@ -40,7 +40,10 @@ export function buildNavGraph(world: StaticWorld, clearance = 0.55): NavGraph {
   }
   const edges: number[][] = nodes.map(() => []);
   const dirs = [
-    [1, 0], [0, 1], [1, 1], [1, -1],
+    [1, 0],
+    [0, 1],
+    [1, 1],
+    [1, -1],
   ];
   nodes.forEach((n, i) => {
     const ix = Math.round(n.x / cell);

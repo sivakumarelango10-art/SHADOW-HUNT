@@ -14,7 +14,8 @@ export function Players({ shadows }: { shadows: boolean }) {
   const snap = useRoom((s) => s.snap);
   const sessionId = useRoom((s) => s.sessionId);
   const list = useMemo(
-    () => (snap?.players ?? []).filter((p) => p.sessionId !== sessionId).map((p) => `${p.sessionId}|${p.characterId}|${p.skinId}`),
+    () =>
+      (snap?.players ?? []).filter((p) => p.sessionId !== sessionId).map((p) => `${p.sessionId}|${p.characterId}|${p.skinId}`),
     [snap?.players, sessionId],
   );
   const keys = [...new Set(list)];
@@ -28,7 +29,17 @@ export function Players({ shadows }: { shadows: boolean }) {
   );
 }
 
-function RemotePlayer({ sessionId, characterId, skinId, shadows }: { sessionId: string; characterId: CharacterId; skinId: string; shadows: boolean }) {
+function RemotePlayer({
+  sessionId,
+  characterId,
+  skinId,
+  shadows,
+}: {
+  sessionId: string;
+  characterId: CharacterId;
+  skinId: string;
+  shadows: boolean;
+}) {
   const rig = useMemo(() => createRig(characterId, skinId, shadows), [characterId, skinId, shadows]);
   useEffect(() => () => rig.dispose(), [rig]);
   const beam = useMemo(() => {
@@ -50,8 +61,16 @@ function RemotePlayer({ sessionId, characterId, skinId, shadows }: { sessionId: 
   }, []);
   const spot = useRef<THREE.SpotLight>(null);
   const pose = useRef<Pose>({
-    speed: 0, crouching: false, sprinting: false, condition: 'healthy', action: 'none', attackSeq: 0, hitSeq: 0, pitch: 0,
-    carryingKey: false, flashlight: false,
+    speed: 0,
+    crouching: false,
+    sprinting: false,
+    condition: 'healthy',
+    action: 'none',
+    attackSeq: 0,
+    hitSeq: 0,
+    pitch: 0,
+    carryingKey: false,
+    flashlight: false,
   });
   const step = useRef(0);
 

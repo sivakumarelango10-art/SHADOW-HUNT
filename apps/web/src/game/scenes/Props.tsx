@@ -56,7 +56,18 @@ function buildProps(map: MapDef, shadows: boolean) {
     const bulbMat = T(new THREE.MeshBasicMaterial({ color: '#2a2a20' }));
     const bulb = new THREE.Mesh(T(new THREE.SphereGeometry(0.07, 10, 8)), bulbMat);
     bulb.position.set(0.3, 1.3, 0);
-    const glow = new THREE.Sprite(T(new THREE.SpriteMaterial({ map: glowTex, color: '#ffd28a', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })));
+    const glow = new THREE.Sprite(
+      T(
+        new THREE.SpriteMaterial({
+          map: glowTex,
+          color: '#ffd28a',
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          opacity: 0,
+        }),
+      ),
+    );
     glow.scale.setScalar(1.2);
     glow.position.copy(bulb.position);
     const front = new THREE.Mesh(box(0.6, 0.35, 0.02), dark);
@@ -116,7 +127,17 @@ function buildProps(map: MapDef, shadows: boolean) {
       panel.add(lamp);
       return m;
     });
-    const beacon = new THREE.Sprite(T(new THREE.SpriteMaterial({ map: glowTex, color: '#ff3020', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })));
+    const beacon = new THREE.Sprite(
+      T(
+        new THREE.SpriteMaterial({
+          map: glowTex,
+          color: '#ff3020',
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+        }),
+      ),
+    );
     beacon.position.set(0, 1.55, 0);
     beacon.scale.setScalar(0.8);
     panel.add(beacon);
@@ -223,7 +244,12 @@ function buildProps(map: MapDef, shadows: boolean) {
     const hole = new THREE.Mesh(T(new THREE.PlaneGeometry(1.3, 1.3)), T(new THREE.MeshBasicMaterial({ color: '#000000' })));
     hole.rotation.x = -Math.PI / 2;
     root.add(hole);
-    for (const [x, z, w, d] of [[0, -0.7, 1.5, 0.12], [0, 0.7, 1.5, 0.12], [-0.7, 0, 0.12, 1.4], [0.7, 0, 0.12, 1.4]] as const) {
+    for (const [x, z, w, d] of [
+      [0, -0.7, 1.5, 0.12],
+      [0, 0.7, 1.5, 0.12],
+      [-0.7, 0, 0.12, 1.4],
+      [0.7, 0, 0.12, 1.4],
+    ] as const) {
       const rim = new THREE.Mesh(box(w, 0.08, d), metal);
       rim.position.set(x, 0.04, z);
       root.add(rim);
@@ -236,7 +262,15 @@ function buildProps(map: MapDef, shadows: boolean) {
   }
 
   // ---------------- Keys & pickups
-  const keyMat = T(new THREE.MeshStandardMaterial({ color: '#e8c060', emissive: '#a07010', emissiveIntensity: 1.6, metalness: 0.9, roughness: 0.3 }));
+  const keyMat = T(
+    new THREE.MeshStandardMaterial({
+      color: '#e8c060',
+      emissive: '#a07010',
+      emissiveIntensity: 1.6,
+      metalness: 0.9,
+      roughness: 0.3,
+    }),
+  );
   const keyGeo = (() => {
     const g = new THREE.Group();
     const bow = new THREE.Mesh(T(new THREE.TorusGeometry(0.05, 0.015, 6, 12)), keyMat);
@@ -251,7 +285,18 @@ function buildProps(map: MapDef, shadows: boolean) {
   for (let i = 0; i < 8; i++) {
     const root = new THREE.Group();
     root.add(keyGeo.clone());
-    const glow = new THREE.Sprite(T(new THREE.SpriteMaterial({ map: glowTex, color: '#ffcf60', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.8 })));
+    const glow = new THREE.Sprite(
+      T(
+        new THREE.SpriteMaterial({
+          map: glowTex,
+          color: '#ffcf60',
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          opacity: 0.8,
+        }),
+      ),
+    );
     glow.scale.setScalar(0.9);
     root.add(glow);
     root.visible = false;
@@ -264,7 +309,10 @@ function buildProps(map: MapDef, shadows: boolean) {
     root.position.set(p.x, 0, p.z);
     let m: THREE.Object3D;
     if (p.kind === 'battery') {
-      m = new THREE.Mesh(cyl(0.05, 0.05, 0.16, 10), T(new THREE.MeshStandardMaterial({ color: '#3a7a4a', emissive: '#1a5a2a', emissiveIntensity: 1 })));
+      m = new THREE.Mesh(
+        cyl(0.05, 0.05, 0.16, 10),
+        T(new THREE.MeshStandardMaterial({ color: '#3a7a4a', emissive: '#1a5a2a', emissiveIntensity: 1 })),
+      );
       m.rotation.z = Math.PI / 2;
     } else if (p.kind === 'medkit') {
       const g = new THREE.Group();
@@ -276,12 +324,26 @@ function buildProps(map: MapDef, shadows: boolean) {
       g.add(cross1, cross2);
       m = g;
     } else {
-      m = new THREE.Mesh(cyl(0.03, 0.03, 0.2, 8), T(new THREE.MeshStandardMaterial({ color: '#b02020', emissive: '#501010', emissiveIntensity: 1 })));
+      m = new THREE.Mesh(
+        cyl(0.03, 0.03, 0.2, 8),
+        T(new THREE.MeshStandardMaterial({ color: '#b02020', emissive: '#501010', emissiveIntensity: 1 })),
+      );
       m.rotation.z = Math.PI / 2;
     }
     m.position.y = 0.1;
     root.add(m);
-    const glow = new THREE.Sprite(T(new THREE.SpriteMaterial({ map: glowTex, color: p.kind === 'battery' ? '#60ff90' : p.kind === 'medkit' ? '#ffffff' : '#ff6040', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.35 })));
+    const glow = new THREE.Sprite(
+      T(
+        new THREE.SpriteMaterial({
+          map: glowTex,
+          color: p.kind === 'battery' ? '#60ff90' : p.kind === 'medkit' ? '#ffffff' : '#ff6040',
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          opacity: 0.35,
+        }),
+      ),
+    );
     glow.scale.setScalar(0.7);
     glow.position.y = 0.15;
     root.add(glow);

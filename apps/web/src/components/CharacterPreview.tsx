@@ -7,7 +7,19 @@ function Model({ id, skin, pose }: { id: CharacterId; skin: string; pose: Partia
   const rig = useMemo(() => createRig(id, skin, false), [id, skin]);
   useEffect(() => () => rig.dispose(), [rig]);
   const p = useMemo<Pose>(
-    () => ({ speed: 0, crouching: false, sprinting: false, condition: 'healthy', action: 'none', attackSeq: 0, hitSeq: 0, pitch: 0, carryingKey: false, flashlight: false, ...pose }),
+    () => ({
+      speed: 0,
+      crouching: false,
+      sprinting: false,
+      condition: 'healthy',
+      action: 'none',
+      attackSeq: 0,
+      hitSeq: 0,
+      pitch: 0,
+      carryingKey: false,
+      flashlight: false,
+      ...pose,
+    }),
     [pose],
   );
   useFrame((st, dt) => {
@@ -25,11 +37,23 @@ function Aim({ y }: { y: number }) {
 }
 
 /** Turntable preview of a character rig (same rig used in-game). */
-export function CharacterPreview({ id, skin = 'default', className = '' }: { id: CharacterId; skin?: string; className?: string }) {
+export function CharacterPreview({
+  id,
+  skin = 'default',
+  className = '',
+}: {
+  id: CharacterId;
+  skin?: string;
+  className?: string;
+}) {
   const hunter = id === 'wraith' || id === 'butcher' || id === 'hollow';
   return (
     <div className={`relative ${className}`}>
-      <Canvas dpr={[1, 1.5]} camera={{ fov: 30, position: [0, hunter ? 1.6 : 1.3, hunter ? 6.4 : 5] }} gl={{ antialias: true, alpha: true }}>
+      <Canvas
+        dpr={[1, 1.5]}
+        camera={{ fov: 30, position: [0, hunter ? 1.6 : 1.3, hunter ? 6.4 : 5] }}
+        gl={{ antialias: true, alpha: true }}
+      >
         <Aim y={hunter ? 1.25 : 0.95} />
         <ambientLight intensity={0.5} color="#8090a8" />
         <directionalLight position={[2, 4, 3]} intensity={1.8} color="#d8e0ff" />

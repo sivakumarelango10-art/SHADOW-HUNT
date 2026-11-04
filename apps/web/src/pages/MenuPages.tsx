@@ -37,7 +37,14 @@ export function CharactersPage() {
   return (
     <PageShell title="Characters" subtitle="Unlocked by playing — never by paying" onBack={back} wide>
       <div className="mb-4">
-        <Segmented value={tab} options={[{ value: 'survivor', label: 'Survivors' }, { value: 'hunter', label: 'Hunters' }]} onChange={setTab} />
+        <Segmented
+          value={tab}
+          options={[
+            { value: 'survivor', label: 'Survivors' },
+            { value: 'hunter', label: 'Hunters' },
+          ]}
+          onChange={setTab}
+        />
       </div>
       <div className="grid gap-5 md:grid-cols-[220px_1fr]">
         <div className="flex flex-row flex-wrap gap-2 md:flex-col">
@@ -48,7 +55,9 @@ export function CharactersPage() {
               className={`rounded-lg border px-4 py-2.5 text-left transition ${sel === id ? 'border-bone/50 bg-white/[0.05]' : 'border-line hover:border-bone/25'} ${isCharacterUnlocked(id, level) ? '' : 'opacity-50'}`}
             >
               <div className="font-display tracking-wider">{CHARACTERS[id].name}</div>
-              <div className="text-[11px] text-dim">{isCharacterUnlocked(id, level) ? CHARACTERS[id].tagline : `Unlocks at level ${CHARACTERS[id].unlockLevel}`}</div>
+              <div className="text-[11px] text-dim">
+                {isCharacterUnlocked(id, level) ? CHARACTERS[id].tagline : `Unlocks at level ${CHARACTERS[id].unlockLevel}`}
+              </div>
             </button>
           ))}
         </div>
@@ -62,7 +71,9 @@ export function CharactersPage() {
               <div className="label mb-1">{def.role === 'hunter' ? 'Power' : 'Perk'}</div>
               {def.perk ?? (def.ability ? abilityText(def.ability) : '')}
             </div>
-            <div className="mt-3 text-xs text-dim">{unlocked ? 'Unlocked' : `Reach level ${def.unlockLevel} to play ${def.name}.`}</div>
+            <div className="mt-3 text-xs text-dim">
+              {unlocked ? 'Unlocked' : `Reach level ${def.unlockLevel} to play ${def.name}.`}
+            </div>
           </div>
         </div>
       </div>
@@ -201,7 +212,10 @@ export function StatsPage() {
         {ACHIEVEMENTS.map((a) => {
           const has = profile.achievements.includes(a.id);
           return (
-            <div key={a.id} className={`flex items-center gap-3 rounded-lg border p-3 ${has ? 'border-amber-300/40 bg-amber-300/[0.04]' : 'border-line opacity-60'}`}>
+            <div
+              key={a.id}
+              className={`flex items-center gap-3 rounded-lg border p-3 ${has ? 'border-amber-300/40 bg-amber-300/[0.04]' : 'border-line opacity-60'}`}
+            >
               <span className="text-xl">{has ? '🏆' : '🔒'}</span>
               <div>
                 <div className="font-display tracking-wider">{a.name}</div>
@@ -293,7 +307,10 @@ export function FriendsPage() {
               <div className="flex-1">
                 <div>{f.username}</div>
                 <div className="text-xs text-dim">
-                  Lv {f.level} · <span className={f.online ? 'text-emerald-300' : ''}>{f.online ? (f.roomCode ? 'In a lobby' : 'Online') : 'Offline'}</span>
+                  Lv {f.level} ·{' '}
+                  <span className={f.online ? 'text-emerald-300' : ''}>
+                    {f.online ? (f.roomCode ? 'In a lobby' : 'Online') : 'Offline'}
+                  </span>
                 </div>
               </div>
               {f.roomCode && (
@@ -335,7 +352,11 @@ export function ProfilePage() {
     }
   };
   return (
-    <PageShell title="Profile" subtitle={authKind === 'guest' ? 'Guest profile — saved to this browser' : 'Signed in'} onBack={back}>
+    <PageShell
+      title="Profile"
+      subtitle={authKind === 'guest' ? 'Guest profile — saved to this browser' : 'Signed in'}
+      onBack={back}
+    >
       <div className="panel flex flex-wrap items-center gap-5 p-5">
         <Avatar id={profile.avatar} size={84} />
         <div className="flex-1">
@@ -373,7 +394,11 @@ export function ProfilePage() {
           <div className="label mt-5 mb-2">Avatar</div>
           <div className="flex flex-wrap gap-2">
             {AVATARS.map((a) => (
-              <button key={a} onClick={() => save({ avatar: a })} className={`rounded-full ${profile.avatar === a ? 'ring-2 ring-blood' : ''}`}>
+              <button
+                key={a}
+                onClick={() => save({ avatar: a })}
+                className={`rounded-full ${profile.avatar === a ? 'ring-2 ring-blood' : ''}`}
+              >
                 <Avatar id={a} size={48} />
               </button>
             ))}
@@ -389,7 +414,9 @@ export function ProfilePage() {
             </button>
           ) : supabaseConfigured ? (
             <div className="flex flex-col gap-2">
-              <p className="text-sm text-ash">Sign in to keep your progress across devices. Your guest progress stays on this browser.</p>
+              <p className="text-sm text-ash">
+                Sign in to keep your progress across devices. Your guest progress stays on this browser.
+              </p>
               <button className="btn" onClick={() => signInWithGoogle().catch((e) => setMsg(e.message))}>
                 Continue with Google
               </button>
@@ -404,7 +431,13 @@ export function ProfilePage() {
                   }
                 }}
               >
-                <input className="field" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input
+                  className="field"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
                 <button className="btn" disabled={!email.includes('@')}>
                   Email link
                 </button>
@@ -412,11 +445,18 @@ export function ProfilePage() {
             </div>
           ) : (
             <p className="text-sm text-ash">
-              You are playing as a guest. Accounts (Google / email) become available when this deployment is connected to Supabase — see the deployment guide.
+              You are playing as a guest. Accounts (Google / email) become available when this deployment is connected to Supabase
+              — see the deployment guide.
             </p>
           )}
           {authKind === 'guest' && (
-            <button className="btn btn-ghost mt-4 text-dim" onClick={() => confirm('Start over with a new guest profile? Your current guest progress will be lost on this browser.') && void signOut()}>
+            <button
+              className="btn btn-ghost mt-4 text-dim"
+              onClick={() =>
+                confirm('Start over with a new guest profile? Your current guest progress will be lost on this browser.') &&
+                void signOut()
+              }
+            >
               Reset guest profile
             </button>
           )}

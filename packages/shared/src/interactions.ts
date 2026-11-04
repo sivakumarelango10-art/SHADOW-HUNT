@@ -84,7 +84,17 @@ export function getInteractions(w: InteractWorld, me: InteractPlayer, rangeBonus
     }
     if (me.hiddenIn) {
       const l = map.lockers.find((k) => k.id === me.hiddenIn);
-      if (l) out.push({ kind: 'unhide', id: l.id, label: 'Leave hiding spot', duration: OBJECTIVES.hideDuration, continuous: false, x: l.x, z: l.z, score: 0 });
+      if (l)
+        out.push({
+          kind: 'unhide',
+          id: l.id,
+          label: 'Leave hiding spot',
+          duration: OBJECTIVES.hideDuration,
+          continuous: false,
+          x: l.x,
+          z: l.z,
+          score: 0,
+        });
       return out;
     }
     if (!w.powerOn) {
@@ -97,7 +107,12 @@ export function getInteractions(w: InteractWorld, me: InteractPlayer, rangeBonus
     for (const k of w.keys) {
       if (k.carriedBy || k.deposited) continue;
       push({
-        kind: 'pickupKey', id: k.id, label: 'Take access key', duration: OBJECTIVES.keyPickupDuration, x: k.x, z: k.z,
+        kind: 'pickupKey',
+        id: k.id,
+        label: 'Take access key',
+        duration: OBJECTIVES.keyPickupDuration,
+        x: k.x,
+        z: k.z,
         disabled: me.carryingKey ? 'Already carrying a key' : undefined,
       });
     }
@@ -105,20 +120,42 @@ export function getInteractions(w: InteractWorld, me: InteractPlayer, rangeBonus
       const st = w.exit(e.id);
       if (!st || st.open) continue;
       if (me.carryingKey && w.keysDeposited < w.keysRequired) {
-        push({ kind: 'depositKey', id: e.id, label: 'Insert access key', duration: OBJECTIVES.keyDepositDuration, x: e.panel.x, z: e.panel.z });
+        push({
+          kind: 'depositKey',
+          id: e.id,
+          label: 'Insert access key',
+          duration: OBJECTIVES.keyDepositDuration,
+          x: e.panel.x,
+          z: e.panel.z,
+        });
       } else {
         let disabled: string | undefined;
         if (!w.powerOn) disabled = 'No power — repair generators';
         else if (w.keysDeposited < w.keysRequired) disabled = `Needs ${w.keysRequired - w.keysDeposited} more access key(s)`;
         push({
-          kind: 'openExit', id: e.id, label: `Open ${e.name}`, duration: OBJECTIVES.exitOpenDuration, x: e.panel.x, z: e.panel.z,
+          kind: 'openExit',
+          id: e.id,
+          label: `Open ${e.name}`,
+          duration: OBJECTIVES.exitOpenDuration,
+          x: e.panel.x,
+          z: e.panel.z,
           disabled,
         });
       }
     }
     for (const l of map.lockers) {
-      push({ kind: 'hide', id: l.id, label: 'Hide', duration: OBJECTIVES.hideDuration, x: l.x, z: l.z,
-        disabled: w.lockerOccupied(l.id) ? 'Occupied' : undefined }, 1.6);
+      push(
+        {
+          kind: 'hide',
+          id: l.id,
+          label: 'Hide',
+          duration: OBJECTIVES.hideDuration,
+          x: l.x,
+          z: l.z,
+          disabled: w.lockerOccupied(l.id) ? 'Occupied' : undefined,
+        },
+        1.6,
+      );
     }
     for (const p of map.pallets) {
       if (w.pallet(p.id) !== 'up') continue;
@@ -127,8 +164,18 @@ export function getInteractions(w: InteractWorld, me: InteractPlayer, rangeBonus
     for (const p of map.pickups) {
       if (w.pickupTaken(p.id)) continue;
       const label = p.kind === 'battery' ? 'Take battery' : p.kind === 'medkit' ? 'Take med kit' : 'Take firecracker';
-      push({ kind: 'pickup', id: p.id, label, duration: OBJECTIVES.pickupDuration, x: p.x, z: p.z,
-        disabled: p.kind !== 'battery' && me.item ? 'Hands full' : undefined }, 1.6);
+      push(
+        {
+          kind: 'pickup',
+          id: p.id,
+          label,
+          duration: OBJECTIVES.pickupDuration,
+          x: p.x,
+          z: p.z,
+          disabled: p.kind !== 'battery' && me.item ? 'Hands full' : undefined,
+        },
+        1.6,
+      );
     }
     for (const o of w.players) {
       if (o.id === me.id || o.role !== 'survivor') continue;
@@ -154,7 +201,10 @@ export function getInteractions(w: InteractWorld, me: InteractPlayer, rangeBonus
     for (const g of map.generators) {
       const st = w.generator(g.id);
       if (!st || st.completed || st.kicked || st.progress <= 0.02 || w.powerOn) continue;
-      push({ kind: 'kick', id: g.id, label: 'Damage generator', duration: HUNTER.kickGeneratorDuration, x: g.x, z: g.z }, RANGE + 0.3);
+      push(
+        { kind: 'kick', id: g.id, label: 'Damage generator', duration: HUNTER.kickGeneratorDuration, x: g.x, z: g.z },
+        RANGE + 0.3,
+      );
     }
     for (const l of map.lockers) {
       push({ kind: 'search', id: l.id, label: 'Search', duration: HUNTER.searchLockerDuration, x: l.x, z: l.z }, 1.8);
@@ -165,10 +215,18 @@ export function getInteractions(w: InteractWorld, me: InteractPlayer, rangeBonus
   for (const d of map.doors) {
     const st = w.door(d.id);
     if (!st) continue;
-    push({
-      kind: 'door', id: d.id, label: st.open ? 'Close door' : 'Open door', duration: OBJECTIVES.doorDuration, x: d.x, z: d.z,
-      disabled: st.locked ? 'Locked — restore power' : undefined,
-    }, 1.8);
+    push(
+      {
+        kind: 'door',
+        id: d.id,
+        label: st.open ? 'Close door' : 'Open door',
+        duration: OBJECTIVES.doorDuration,
+        x: d.x,
+        z: d.z,
+        disabled: st.locked ? 'Locked — restore power' : undefined,
+      },
+      1.8,
+    );
   }
   for (const h of map.hatches) {
     push({ kind: 'hatch', id: h.id, label: h.label, duration: OBJECTIVES.hatchDuration, x: h.x, z: h.z }, 1.7);

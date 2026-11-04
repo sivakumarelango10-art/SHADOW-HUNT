@@ -33,7 +33,9 @@ export function Effects({ map }: { map: MapDef }) {
   useEffect(() => {
     const offs = [
       bus.on('fx', (m) => onFx(sys, m, map)),
-      bus.on('noise', (m) => sys.ring(m.x, m.z, m.kind === 'step' ? '#ff8a6a' : '#ff3a2a', m.kind === 'sprint' || m.kind === 'step' ? 1.2 : 2.8)),
+      bus.on('noise', (m) =>
+        sys.ring(m.x, m.z, m.kind === 'step' ? '#ff8a6a' : '#ff3a2a', m.kind === 'sprint' || m.kind === 'step' ? 1.2 : 2.8),
+      ),
       bus.on('track', (m) => sys.mark(m.x, m.z, m.kind)),
       bus.on('reveal', (m) => m.targets.forEach((t) => sys.silhouette(t.x, t.z, m.duration + 0.2))),
     ];
@@ -188,7 +190,18 @@ function createEffects() {
   group.add(glowPoints);
 
   const parts: (Particle & { glow: boolean })[] = Array.from({ length: MAX }, () => ({
-    active: false, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, life: 0, max: 1, size: 0.1, color: new THREE.Color(), glow: false,
+    active: false,
+    x: 0,
+    y: 0,
+    z: 0,
+    vx: 0,
+    vy: 0,
+    vz: 0,
+    life: 0,
+    max: 1,
+    size: 0.1,
+    color: new THREE.Color(),
+    glow: false,
   }));
   let cursor = 0;
 
@@ -202,7 +215,13 @@ function createEffects() {
   const marks: { mesh: THREE.Mesh; t: number }[] = [];
   // Silhouettes (Echo Sense)
   const silGeo = new THREE.CapsuleGeometry(0.32, 1.1, 4, 8);
-  const silMat = new THREE.MeshBasicMaterial({ color: '#ff2a2a', transparent: true, opacity: 0.6, depthTest: false, blending: THREE.AdditiveBlending });
+  const silMat = new THREE.MeshBasicMaterial({
+    color: '#ff2a2a',
+    transparent: true,
+    opacity: 0.6,
+    depthTest: false,
+    blending: THREE.AdditiveBlending,
+  });
   const sils: { mesh: THREE.Mesh; t: number; max: number }[] = [];
   // Firecracker flash light
   const flashLight = new THREE.PointLight('#ffd8a0', 0, 18, 1.5);
@@ -235,14 +254,20 @@ function createEffects() {
       for (let i = 0; i < n; i++) spawn(x, y, z, color, speed * (0.3 + Math.random()), life, sz * (0.6 + Math.random()), glow);
     },
     ring(x: number, z: number, color: string, scale: number) {
-      const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.9, depthTest: false, side: THREE.DoubleSide }));
+      const m = new THREE.Mesh(
+        ringGeo,
+        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.9, depthTest: false, side: THREE.DoubleSide }),
+      );
       m.position.set(x, 0.15, z);
       m.renderOrder = 10;
       group.add(m);
       rings.push({ mesh: m, t: 0, max: 1.6, scale });
     },
     shockwave(x: number, z: number, color: string, radius: number) {
-      const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.6, side: THREE.DoubleSide }));
+      const m = new THREE.Mesh(
+        ringGeo,
+        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.6, side: THREE.DoubleSide }),
+      );
       m.position.set(x, 0.2, z);
       group.add(m);
       rings.push({ mesh: m, t: 0, max: 1.2, scale: radius });
@@ -250,7 +275,12 @@ function createEffects() {
     mark(x: number, z: number, kind: 'scratch' | 'blood') {
       const m = new THREE.Mesh(
         markGeo,
-        new THREE.MeshBasicMaterial({ color: kind === 'scratch' ? '#ff5a3a' : '#a00808', transparent: true, opacity: 0.85, depthTest: false }),
+        new THREE.MeshBasicMaterial({
+          color: kind === 'scratch' ? '#ff5a3a' : '#a00808',
+          transparent: true,
+          opacity: 0.85,
+          depthTest: false,
+        }),
       );
       m.position.set(x + (Math.random() - 0.5) * 0.4, 0.04, z + (Math.random() - 0.5) * 0.4);
       m.rotation.y = Math.random() * Math.PI;
@@ -309,7 +339,10 @@ function createEffects() {
       geo.setDrawRange(0, n);
       glowGeo.setDrawRange(0, g);
       geo.attributes.position!.needsUpdate = geo.attributes.color!.needsUpdate = geo.attributes.size!.needsUpdate = true;
-      glowGeo.attributes.position!.needsUpdate = glowGeo.attributes.color!.needsUpdate = glowGeo.attributes.size!.needsUpdate = true;
+      glowGeo.attributes.position!.needsUpdate =
+        glowGeo.attributes.color!.needsUpdate =
+        glowGeo.attributes.size!.needsUpdate =
+          true;
 
       for (let i = rings.length - 1; i >= 0; i--) {
         const r = rings[i]!;

@@ -124,7 +124,14 @@ function build(): MapDef {
   // Lobby
   b.box(0, 10.5, 7, 1.3, 1.1, 'counter');
   // Cafeteria tables
-  for (const [x, z] of [[16, 6], [16, 10.5], [24, 6], [24, 10.5], [32, 10.5]] as const) b.box(x, z, 3, 1.3, 0.75, 'table');
+  for (const [x, z] of [
+    [16, 6],
+    [16, 10.5],
+    [24, 6],
+    [24, 10.5],
+    [32, 10.5],
+  ] as const)
+    b.box(x, z, 3, 1.3, 0.75, 'table');
   // Laundry machines
   for (const z of [20.5, 23, 27.5]) b.box(11.1, z, 1.5, 1.5, 1.2, 'cabinet');
   // Kitchen counters
@@ -152,29 +159,94 @@ function build(): MapDef {
 
   const lockers: LockerDef[] = (
     [
-      [-20.7, -25, -Math.PI / 2], [-4.7, -25, -Math.PI / 2], [11.3, -25, -Math.PI / 2],
-      [-43.3, -8, Math.PI / 2], [3.3, -11.5, -Math.PI / 2], [3.3, -5.5, -Math.PI / 2],
-      [43.3, -11, -Math.PI / 2], [43.3, -6, -Math.PI / 2], [-43.3, 11.5, Math.PI / 2],
-      [-10.7, 26.5, -Math.PI / 2], [25.3, 28.5, -Math.PI / 2], [27.2, 29.3, Math.PI],
-      [-43.3, 26, Math.PI / 2], [-9.3, 12.5, Math.PI / 2], [9.3, 27, -Math.PI / 2],
-      [107, -14.5, 0], [143.3, -3.5, -Math.PI / 2], [127.3, 13.5, -Math.PI / 2],
+      [-20.7, -25, -Math.PI / 2],
+      [-4.7, -25, -Math.PI / 2],
+      [11.3, -25, -Math.PI / 2],
+      [-43.3, -8, Math.PI / 2],
+      [3.3, -11.5, -Math.PI / 2],
+      [3.3, -5.5, -Math.PI / 2],
+      [43.3, -11, -Math.PI / 2],
+      [43.3, -6, -Math.PI / 2],
+      [-43.3, 11.5, Math.PI / 2],
+      [-10.7, 26.5, -Math.PI / 2],
+      [25.3, 28.5, -Math.PI / 2],
+      [27.2, 29.3, Math.PI],
+      [-43.3, 26, Math.PI / 2],
+      [-9.3, 12.5, Math.PI / 2],
+      [9.3, 27, -Math.PI / 2],
+      [107, -14.5, 0],
+      [143.3, -3.5, -Math.PI / 2],
+      [127.3, 13.5, -Math.PI / 2],
     ] as const
   ).map(([x, z, rot], i) => ({ id: `locker${i}`, x, z, rot }));
 
   const pickups: PickupDef[] = [
-    ...([[-38, -20], [24, -20], [-33, 12], [20, 24], [-8, 20], [36, -4], [140, 4], [-12, -4]] as const).map(
-      ([x, z], i) => ({ id: `battery${i}`, kind: 'battery' as const, x, z }),
-    ),
-    ...([[29, -6], [-41, 4], [122, -14]] as const).map(([x, z], i) => ({ id: `medkit${i}`, kind: 'medkit' as const, x, z })),
-    ...([[39.5, -21], [-26, 27], [7, -12]] as const).map(([x, z], i) => ({ id: `fire${i}`, kind: 'firecracker' as const, x, z })),
+    ...(
+      [
+        [-38, -20],
+        [24, -20],
+        [-33, 12],
+        [20, 24],
+        [-8, 20],
+        [36, -4],
+        [140, 4],
+        [-12, -4],
+      ] as const
+    ).map(([x, z], i) => ({ id: `battery${i}`, kind: 'battery' as const, x, z })),
+    ...(
+      [
+        [29, -6],
+        [-41, 4],
+        [122, -14],
+      ] as const
+    ).map(([x, z], i) => ({ id: `medkit${i}`, kind: 'medkit' as const, x, z })),
+    ...(
+      [
+        [39.5, -21],
+        [-26, 27],
+        [7, -12],
+      ] as const
+    ).map(([x, z], i) => ({ id: `fire${i}`, kind: 'firecracker' as const, x, z })),
   ];
 
   const shadowPoints: Vec2[] = (
     [
-      [-42, -28], [-22, -22], [-6, -22], [10, -22], [22, -20], [42, -28], [-42, -16], [14, -16], [-42, -12], [-20, -12],
-      [-16, -3], [16, -12], [30, -12], [42, -3], [-42, 0], [-12, 0], [12, 0], [42, 0], [-42, 4], [-12, 12], [-42, 16],
-      [-8, 28], [8, 4], [42, 12], [12, 16], [42, 16], [24, 20], [42, 29], [-38, 20], [-14, 20], [104, 4], [118, -5],
-      [134, -10], [126, 5], [142, 5], [110, 14],
+      [-42, -28],
+      [-22, -22],
+      [-6, -22],
+      [10, -22],
+      [22, -20],
+      [42, -28],
+      [-42, -16],
+      [14, -16],
+      [-42, -12],
+      [-20, -12],
+      [-16, -3],
+      [16, -12],
+      [30, -12],
+      [42, -3],
+      [-42, 0],
+      [-12, 0],
+      [12, 0],
+      [42, 0],
+      [-42, 4],
+      [-12, 12],
+      [-42, 16],
+      [-8, 28],
+      [8, 4],
+      [42, 12],
+      [12, 16],
+      [42, 16],
+      [24, 20],
+      [42, 29],
+      [-38, 20],
+      [-14, 20],
+      [104, 4],
+      [118, -5],
+      [134, -10],
+      [126, 5],
+      [142, 5],
+      [110, 14],
     ] as const
   ).map(([x, z]) => ({ x, z }));
 
@@ -201,16 +273,37 @@ function build(): MapDef {
 
   const decor: DecorDef[] = [];
   const add = (kind: DecorDef['kind'], x: number, z: number, rot = 0, scale = 1) => decor.push({ kind, x, z, rot, scale });
-  add('wheelchair', -40, -16, 0.6); add('wheelchair', 20, -0.5, 2.1); add('wheelchair', 38, 16, 4);
-  add('iv_stand', -33.5, -26); add('iv_stand', -27, -10); add('iv_stand', 3, -27); add('iv_stand', 130, -12);
+  add('wheelchair', -40, -16, 0.6);
+  add('wheelchair', 20, -0.5, 2.1);
+  add('wheelchair', 38, 16, 4);
+  add('iv_stand', -33.5, -26);
+  add('iv_stand', -27, -10);
+  add('iv_stand', 3, -27);
+  add('iv_stand', 130, -12);
   for (let i = 0; i < 14; i++) add('papers', -40 + i * 6.3, ((i * 7.1) % 30) - 15, i);
-  add('blood', -36, -22, 0, 1.4); add('blood', -2, 0, 1, 1); add('blood', 132, -13, 2, 1.6); add('blood', -24, 26, 0.5, 1);
-  add('chair', -21, 7, 0.4); add('chair', -17, 9, 2.4); add('chair', -23, 10, 4.1); add('chair', -19, 4.5, 5.5);
-  add('chair', 14, 4.4, 0); add('chair', 22, 12.2, Math.PI); add('chair', 30, 12.2, 3);
-  add('bucket', -1, -9); add('bucket', 18, 27); add('drain', -1, -8); add('drain', 120, 0);
-  add('sign', 0, 29.6, Math.PI); add('sign', 43.6, 24, -Math.PI / 2);
-  add('barrel', 98, 12); add('barrel', 100, -12); add('barrel', 140, 12); add('barrel', 141, -12);
-  add('bones', 134, -6); add('skull_pile', 98.5, -14);
+  add('blood', -36, -22, 0, 1.4);
+  add('blood', -2, 0, 1, 1);
+  add('blood', 132, -13, 2, 1.6);
+  add('blood', -24, 26, 0.5, 1);
+  add('chair', -21, 7, 0.4);
+  add('chair', -17, 9, 2.4);
+  add('chair', -23, 10, 4.1);
+  add('chair', -19, 4.5, 5.5);
+  add('chair', 14, 4.4, 0);
+  add('chair', 22, 12.2, Math.PI);
+  add('chair', 30, 12.2, 3);
+  add('bucket', -1, -9);
+  add('bucket', 18, 27);
+  add('drain', -1, -8);
+  add('drain', 120, 0);
+  add('sign', 0, 29.6, Math.PI);
+  add('sign', 43.6, 24, -Math.PI / 2);
+  add('barrel', 98, 12);
+  add('barrel', 100, -12);
+  add('barrel', 140, 12);
+  add('barrel', 141, -12);
+  add('bones', 134, -6);
+  add('skull_pile', 98.5, -14);
 
   return {
     id: 'asylum',
@@ -221,9 +314,39 @@ function build(): MapDef {
     bounds: { minX: -50, maxX: 150, minZ: -36, maxZ: 40 },
     regions: [
       { id: 'main', name: 'Asylum', minX: -44, maxX: 44, minZ: -30, maxZ: 30, indoor: true, ceiling: 3.6, floor: 'tile' },
-      { id: 'vest_s', name: 'Main Entrance', minX: -2.2, maxX: 2.2, minZ: 30, maxZ: 35, indoor: false, ceiling: 0, floor: 'gravel' },
-      { id: 'vest_e', name: 'Loading Dock', minX: 44, maxX: 49, minZ: 21.8, maxZ: 26.2, indoor: false, ceiling: 0, floor: 'gravel' },
-      { id: 'basement', name: 'Basement', minX: 96, maxX: 144, minZ: -16, maxZ: 16, indoor: true, ceiling: 3.2, floor: 'concrete' },
+      {
+        id: 'vest_s',
+        name: 'Main Entrance',
+        minX: -2.2,
+        maxX: 2.2,
+        minZ: 30,
+        maxZ: 35,
+        indoor: false,
+        ceiling: 0,
+        floor: 'gravel',
+      },
+      {
+        id: 'vest_e',
+        name: 'Loading Dock',
+        minX: 44,
+        maxX: 49,
+        minZ: 21.8,
+        maxZ: 26.2,
+        indoor: false,
+        ceiling: 0,
+        floor: 'gravel',
+      },
+      {
+        id: 'basement',
+        name: 'Basement',
+        minX: 96,
+        maxX: 144,
+        minZ: -16,
+        maxZ: 16,
+        indoor: true,
+        ceiling: 3.2,
+        floor: 'concrete',
+      },
     ],
     boxes: b.boxes,
     circles,
@@ -238,7 +361,17 @@ function build(): MapDef {
     ],
     generatorsRequired: 5,
     keySpawns: (
-      [[-15, -27], [9, -28.5], [38, -21], [-8.5, -12], [30, -3.5], [-32, 26.5], [22.5, 28.5], [115, -14.5], [132, -11]] as const
+      [
+        [-15, -27],
+        [9, -28.5],
+        [38, -21],
+        [-8.5, -12],
+        [30, -3.5],
+        [-32, 26.5],
+        [22.5, 28.5],
+        [115, -14.5],
+        [132, -11],
+      ] as const
     ).map(([x, z]) => ({ x, z })),
     keysRequired: 2,
     keysSpawned: 4,
@@ -259,7 +392,15 @@ function build(): MapDef {
       },
     ],
     cages: (
-      [[-30, -16], [30, -16], [0, 0], [-26, 16], [26, 16], [-3, 24], [131, -9]] as const
+      [
+        [-30, -16],
+        [30, -16],
+        [0, 0],
+        [-26, 16],
+        [26, 16],
+        [-3, 24],
+        [131, -9],
+      ] as const
     ).map(([x, z], i) => ({ id: `cage${i}`, x, z })),
     lockers,
     pallets: [
@@ -283,7 +424,18 @@ function build(): MapDef {
     ],
     pickups,
     shadowPoints,
-    survivorSpawns: ([[-4, 24], [4, 24], [-6, 18], [6, 18], [-2, 27], [2, 27], [-7, 26], [7, 26]] as const).map(([x, z]) => ({ x, z })),
+    survivorSpawns: (
+      [
+        [-4, 24],
+        [4, 24],
+        [-6, 18],
+        [6, 18],
+        [-2, 27],
+        [2, 27],
+        [-7, 26],
+        [7, 26],
+      ] as const
+    ).map(([x, z]) => ({ x, z })),
     hunterSpawn: { x: 0, z: -16 },
     lights,
     decor,

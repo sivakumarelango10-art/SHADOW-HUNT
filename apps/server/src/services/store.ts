@@ -19,7 +19,10 @@ import { config, supabaseEnabled } from '../config.ts';
 import { log } from '../utils/log.ts';
 
 export class StoreError extends Error {
-  constructor(public code: 'username_taken' | 'not_found' | 'invalid', message: string) {
+  constructor(
+    public code: 'username_taken' | 'not_found' | 'invalid',
+    message: string,
+  ) {
     super(message);
   }
 }
@@ -159,14 +162,28 @@ export class FileStore implements Store {
 
   async saveMatch(rec: MatchRecord) {
     const playedAt = new Date().toISOString();
-    this.db.matches.push({ id: rec.matchId, mapId: rec.mapId, winner: rec.winner, durationSeconds: rec.durationSeconds, playedAt, results: rec.results });
+    this.db.matches.push({
+      id: rec.matchId,
+      mapId: rec.mapId,
+      winner: rec.winner,
+      durationSeconds: rec.durationSeconds,
+      playedAt,
+      results: rec.results,
+    });
     if (this.db.matches.length > 500) this.db.matches.splice(0, this.db.matches.length - 500);
     for (const pl of rec.players) {
       this.db.profiles[pl.playerId] = structuredClone(pl.profileAfter);
       const h = (this.db.history[pl.playerId] ??= []);
       h.unshift({
-        matchId: rec.matchId, mapId: rec.mapId, role: pl.role, characterId: pl.characterId, outcome: pl.outcome, won: pl.won,
-        xpGained: pl.xpGained, durationSeconds: rec.durationSeconds, playedAt,
+        matchId: rec.matchId,
+        mapId: rec.mapId,
+        role: pl.role,
+        characterId: pl.characterId,
+        outcome: pl.outcome,
+        won: pl.won,
+        xpGained: pl.xpGained,
+        durationSeconds: rec.durationSeconds,
+        playedAt,
       });
       if (h.length > 50) h.length = 50;
     }
@@ -184,7 +201,10 @@ export class FileStore implements Store {
   }
 
   async getProfiles(ids: string[]) {
-    return ids.map((id) => this.db.profiles[id]).filter((p): p is Profile => !!p).map((p) => structuredClone(p));
+    return ids
+      .map((id) => this.db.profiles[id])
+      .filter((p): p is Profile => !!p)
+      .map((p) => structuredClone(p));
   }
 
   async friendIds(id: string) {

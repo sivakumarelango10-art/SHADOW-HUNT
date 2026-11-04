@@ -100,7 +100,10 @@ export const useSession = create<SessionState>((set, get) => ({
     const sbp = getSupabase();
     if (!sbp) throw new Error('Accounts are not configured on this server.');
     const sb = await sbp;
-    const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: location.origin + location.pathname },
+    });
     if (error) throw error;
   },
 

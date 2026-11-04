@@ -67,7 +67,10 @@ describe('server simulation', () => {
     // Put survivors somewhere the bot will find quickly.
     const s0 = state.players.get('s0')!;
     const s1 = state.players.get('s1')!;
-    s0.x = 0; s0.z = -4; s1.x = 2; s1.z = -4;
+    s0.x = 0;
+    s0.z = -4;
+    s1.x = 2;
+    s1.z = -4;
     run(400);
     const bot = state.players.get('bot')!;
     expect(game.runtime('bot')!.stats.hits).toBeGreaterThan(0);
@@ -81,7 +84,16 @@ describe('server simulation', () => {
     const { game, state } = setup('blackwood', 1, false);
     const s = state.players.get('s0')!;
     const start = { x: s.x, z: s.z };
-    const flood: MoveInput[] = Array.from({ length: 12 }, (_, i) => ({ seq: i + 1, dt: 0.1, mx: 0, mz: 1, yaw: s.yaw, pitch: 0, sprint: false, crouch: false }));
+    const flood: MoveInput[] = Array.from({ length: 12 }, (_, i) => ({
+      seq: i + 1,
+      dt: 0.1,
+      mx: 0,
+      mz: 1,
+      yaw: s.yaw,
+      pitch: 0,
+      sprint: false,
+      crouch: false,
+    }));
     game.queueInputs('s0', flood);
     game.update(NET.tickMs / 1000);
     // Only the first tick's worth of budget can be spent.
@@ -96,7 +108,8 @@ describe('server simulation', () => {
     s.x = locker.x + Math.sin(locker.rot) * 1.0;
     s.z = locker.z + Math.cos(locker.rot) * 1.0;
     s.yaw = locker.rot; // facing back at the locker
-    h.x = locker.x + 4; h.z = locker.z; // within breathing earshot
+    h.x = locker.x + 4;
+    h.z = locker.z; // within breathing earshot
     game.requestInteract('s0', 'hide', locker.id);
     run(1);
     expect(s.hiddenIn).toBe(locker.id);
@@ -111,8 +124,11 @@ describe('server simulation', () => {
     const pal = MAPS.asylum.pallets.find((p) => p.id === 'pal2')!; // central corridor, axis z
     const s = state.players.get('s0')!;
     const h = state.players.get('h')!;
-    s.x = pal.x + 1.2; s.z = pal.z; s.yaw = Math.PI / 2; // facing -x towards the pallet
-    h.x = pal.x - 0.2; h.z = pal.z;
+    s.x = pal.x + 1.2;
+    s.z = pal.z;
+    s.yaw = Math.PI / 2; // facing -x towards the pallet
+    h.x = pal.x - 0.2;
+    h.z = pal.z;
     game.requestInteract('s0', 'pallet', pal.id);
     run(0.6);
     expect(state.pallets.get(pal.id)).toBe('down');

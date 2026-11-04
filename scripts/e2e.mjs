@@ -66,15 +66,27 @@ const sid = (page) => page.evaluate(() => window.__shadowHunt?.sessionId());
 const pages = [];
 async function main() {
   console.log('▶ starting server and web client');
-  start('npx', ['tsx', 'src/index.ts'], path.join(root, 'apps/server'), { PORT: String(SERVER_PORT), STORE: 'memory', LOG_LEVEL: 'silent' });
-  start('npx', ['vite', '--port', String(WEB_PORT), '--strictPort'], path.join(root, 'apps/web'), { VITE_SERVER_URL: `http://localhost:${SERVER_PORT}` });
+  start('npx', ['tsx', 'src/index.ts'], path.join(root, 'apps/server'), {
+    PORT: String(SERVER_PORT),
+    STORE: 'memory',
+    LOG_LEVEL: 'silent',
+  });
+  start('npx', ['vite', '--port', String(WEB_PORT), '--strictPort'], path.join(root, 'apps/web'), {
+    VITE_SERVER_URL: `http://localhost:${SERVER_PORT}`,
+  });
   await waitHttp(`http://localhost:${SERVER_PORT}/api/health`);
   await waitHttp(WEB);
 
   const browser = await chromium.launch({
     executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome',
     headless: true,
-    args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required', '--mute-audio'],
+    args: [
+      '--use-angle=swiftshader',
+      '--enable-unsafe-swiftshader',
+      '--ignore-gpu-blocklist',
+      '--autoplay-policy=no-user-gesture-required',
+      '--mute-audio',
+    ],
   });
   const mk = async (name, opts) => {
     const ctx = await browser.newContext(opts);
@@ -82,14 +94,27 @@ async function main() {
     await ctx.addInitScript(() => {
       localStorage.setItem(
         'sh.settings',
-        JSON.stringify({ state: { quality: 'low', renderScale: 0.5, shadows: false, antialias: false, postFx: false, renderDistance: 45, fogQuality: 'low', textureQuality: 'low' }, version: 1 }),
+        JSON.stringify({
+          state: {
+            quality: 'low',
+            renderScale: 0.5,
+            shadows: false,
+            antialias: false,
+            postFx: false,
+            renderDistance: 45,
+            fogQuality: 'low',
+            textureQuality: 'low',
+          },
+          version: 1,
+        }),
       );
     });
     ctx.setDefaultTimeout(60000);
     const page = await ctx.newPage();
     page.on('pageerror', (e) => errors.push(`[${name}] ${e.message}`));
     page.on('console', (m) => {
-      if (m.type() === 'error' && !/WebSocket|favicon|net::ERR|Failed to load resource/i.test(m.text())) errors.push(`[${name}] console: ${m.text()}`);
+      if (m.type() === 'error' && !/WebSocket|favicon|net::ERR|Failed to load resource/i.test(m.text()))
+        errors.push(`[${name}] console: ${m.text()}`);
     });
     pages.push([name, page]);
     return page;
@@ -97,8 +122,14 @@ async function main() {
 
   const A = await mk('host', { viewport: { width: 1280, height: 720 } });
   const B = await mk('hunter', { viewport: { width: 1280, height: 720 } });
-  const C = await mk('phone', { viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2,
-    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' });
+  const C = await mk('phone', {
+    viewport: { width: 844, height: 390 },
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 2,
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+  });
 
   console.log('▶ main menu');
   await A.goto(WEB);
@@ -119,9 +150,21 @@ async function main() {
   await waitFor(A, () => Object.keys(window.__shadowHunt?.state()?.players ?? {}).length === 3, 'three players in lobby', 30000);
   check(true, 'three players see the same lobby');
   // Wait until each joiner's lobby is fully rendered (software WebGL makes first paint slow).
-  for (const p of [B, C]) await waitFor(p, () => [...document.querySelectorAll('button')].some((b) => b.textContent === 'Ready up'), 'joiner lobby', 60000);
+  for (const p of [B, C])
+    await waitFor(
+      p,
+      () => [...document.querySelectorAll('button')].some((b) => b.textContent === 'Ready up'),
+      'joiner lobby',
+      60000,
+    );
   await B.getByRole('switch').click();
-  await waitFor(A, (id) => window.__shadowHunt.state().players[id]?.preferHunter === true, 'hunter preference replicated', 5000, await sid(B));
+  await waitFor(
+    A,
+    (id) => window.__shadowHunt.state().players[id]?.preferHunter === true,
+    'hunter preference replicated',
+    5000,
+    await sid(B),
+  );
   await B.getByRole('button', { name: 'Ready up' }).click();
   await C.getByRole('button', { name: 'Ready up' }).click();
   await waitFor(A, () => Object.values(window.__shadowHunt.state().players).every((p) => p.ready || p.isHost), 'all ready');
@@ -181,7 +224,11 @@ async function main() {
   await waitFor(D, () => window.__shadowHunt?.state()?.roomCode, 'solo room');
   await D.getByRole('button', { name: /Abandoned Asylum/ }).click();
   await D.getByRole('button', { name: 'Bot', exact: true }).click();
-  await waitFor(D, () => window.__shadowHunt.state().hunterMode === 'bot' && window.__shadowHunt.state().mapId === 'asylum', 'solo settings');
+  await waitFor(
+    D,
+    () => window.__shadowHunt.state().hunterMode === 'bot' && window.__shadowHunt.state().mapId === 'asylum',
+    'solo settings',
+  );
   await D.getByRole('button', { name: /Start the hunt/ }).click();
   await waitFor(D, () => window.__shadowHunt.state()?.phase === 'playing', 'solo playing', 60000);
   const sd = await state(D);
@@ -197,7 +244,10 @@ async function main() {
   const botNow = sNow.players[bot.sessionId];
   const meNow = sNow.players[await sid(D)];
   const leftSpawn = Math.hypot(botNow.x - 0, botNow.z - -16) > 3; // asylum hunter spawn (0, -16)
-  check(leftSpawn || meNow.condition !== 'healthy', `bot hunter is hunting (left spawn: ${leftSpawn}, survivor: ${meNow.condition})`);
+  check(
+    leftSpawn || meNow.condition !== 'healthy',
+    `bot hunter is hunting (left spawn: ${leftSpawn}, survivor: ${meNow.condition})`,
+  );
   await shot(D, 'asylum-later');
 
   await browser.close();
@@ -211,7 +261,8 @@ async function main() {
 main()
   .catch(async (e) => {
     console.error(`\n❌ ${e.message}`);
-    for (const [name, page] of pages) if (!page.isClosed()) await page.screenshot({ path: path.join(out, `fail-${name}.png`) }).catch(() => {});
+    for (const [name, page] of pages)
+      if (!page.isClosed()) await page.screenshot({ path: path.join(out, `fail-${name}.png`) }).catch(() => {});
     if (errors.length) console.error(errors.join('\n'));
     process.exitCode = 1;
   })

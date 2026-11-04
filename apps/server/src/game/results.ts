@@ -20,7 +20,11 @@ import type { Game } from './Game.ts';
  * Builds match results from authoritative server state and persists XP, stats and
  * achievements. Nothing here is derived from client-reported data.
  */
-export async function finalizeMatch(game: Game, winner: 'survivors' | 'hunter', playerIds: Map<string, string>): Promise<MatchResults> {
+export async function finalizeMatch(
+  game: Game,
+  winner: 'survivors' | 'hunter',
+  playerIds: Map<string, string>,
+): Promise<MatchResults> {
   const s = game.state;
   const players = [...s.players.values()];
   const survivors = players.filter((p) => p.role === 'survivor');
