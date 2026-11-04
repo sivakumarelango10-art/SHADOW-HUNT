@@ -1,0 +1,7 @@
+**/node_modules
+**/dist
+apps/web
+test-results
+.git
+**/.env
+apps/server/data

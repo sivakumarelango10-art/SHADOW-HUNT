@@ -1,0 +1,19 @@
+# Render Blueprint — persistent Node web service for the game server.
+services:
+  - type: web
+    name: shadow-hunt-server
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GUEST_TOKEN_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

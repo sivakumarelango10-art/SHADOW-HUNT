@@ -1,0 +1,32 @@
+{
+  "name": "shadow-hunt",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter @shadow-hunt/server --filter @shadow-hunt/web dev",
+    "dev:server": "pnpm --filter @shadow-hunt/server dev",
+    "dev:web": "pnpm --filter @shadow-hunt/web dev",
+    "build": "pnpm -r build",
+    "start": "pnpm --filter @shadow-hunt/server start",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "e2e": "node scripts/e2e.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "playwright-core": "^1.64.1",
+    "prettier": "^3.9.10",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.1.0"
+  }
+}

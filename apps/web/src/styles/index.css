@@ -1,0 +1,125 @@
+@import 'tailwindcss';
+@import '@fontsource/cinzel/500.css';
+@import '@fontsource/cinzel/700.css';
+@import '@fontsource-variable/inter';
+
+@theme {
+  --color-void: #050607;
+  --color-night: #0a0c0f;
+  --color-panel: #101317;
+  --color-panel-2: #151920;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-line-strong: rgb(255 255 255 / 0.16);
+  --color-bone: #e8e2d6;
+  --color-ash: #9a9ea6;
+  --color-dim: #5f646c;
+  --color-blood: #b3202b;
+  --color-blood-dark: #6e1118;
+  --color-ember: #d9783a;
+  --color-moon: #a8bcd8;
+  --color-moss: #7d8b6a;
+  --font-display: 'Cinzel', ui-serif, Georgia, serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --animate-flicker: flicker 6s infinite;
+  --animate-pulse-slow: pulse-slow 3s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 18%, 22%, 60%, 63%, 100% { opacity: 1; }
+  20%, 61% { opacity: 0.55; }
+}
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+:root {
+  color-scheme: dark;
+  background: var(--color-void);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+::selection {
+  background: var(--color-blood);
+  color: white;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.15) transparent;
+}
+
+@layer components {
+  .panel {
+    @apply rounded-xl border border-line bg-panel/85 backdrop-blur-sm;
+  }
+  .btn {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-lg border border-line-strong bg-panel-2/80 px-4 py-2.5 text-sm font-medium tracking-wide text-bone transition duration-150 select-none;
+    @apply hover:border-bone/40 hover:bg-panel-2 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40;
+  }
+  .btn-primary {
+    @apply border-blood/70 bg-blood/90 text-white shadow-[0_0_24px_-6px_var(--color-blood)] hover:border-blood hover:bg-blood;
+  }
+  .btn-ghost {
+    @apply border-transparent bg-transparent hover:border-line hover:bg-white/5;
+  }
+  .field {
+    @apply w-full rounded-lg border border-line-strong bg-night/80 px-3 py-2.5 text-bone placeholder:text-dim outline-none transition focus:border-bone/50;
+  }
+  .label {
+    @apply text-[11px] font-semibold tracking-[0.18em] text-ash uppercase;
+  }
+  .heading {
+    @apply font-display tracking-[0.08em] text-bone;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-line px-2 py-0.5 text-[11px] tracking-wide text-ash;
+  }
+}
+
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+  opacity: 0.06;
+  animation: grain 1.2s steps(6) infinite;
+  z-index: 50;
+}
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3%, 2%); }
+  40% { transform: translate(2%, -4%); }
+  60% { transform: translate(-1%, 3%); }
+  80% { transform: translate(4%, 1%); }
+  100% { transform: translate(0, 0); }
+}
+
+.vignette {
+  background: radial-gradient(ellipse at center, transparent 45%, rgb(0 0 0 / 0.75) 100%);
+}
