@@ -16,10 +16,10 @@ There are two ways to host it:
 |---|---|---|
 | Config | Root `vercel.json` (already in the repo) | Web-only Vercel project + Railway / Render / Fly |
 | Domain | One URL; `/api/*` goes to the game server | Two URLs; set `VITE_SERVER_URL` and `CORS_ORIGIN` |
-| WebSockets | Closed at the Vercel Function max duration (**5 min on Hobby**, 800 s on Pro). Clients reconnect automatically to the same seat. | No duration limit |
-| Rooms | In memory on one instance. If Vercel starts a second instance (traffic spike or a deploy mid-match), players reconnecting there lose their room. | One always-on process |
+| WebSockets | Closed at the Vercel Function max duration (**5 min on Hobby**, 800 s on Pro, up to 30 min in the Pro beta) | No duration limit |
+| Rooms | In memory on one instance. **Measured on the live deployment (Hobby):** after the 5-minute cut, the reconnect reached a *different* instance while the original one was still running, so the room was gone. Every player loses their room about 5 minutes after joining it (lobby time included), so full 8–15 minute matches cannot finish. | One always-on process; reconnects return to the same room |
 | Idle | Instance stops after 5 idle minutes (fine between sessions) | Always on |
-| Best for | Casual sessions with friends, one URL, no extra accounts | Reliable long matches, more players |
+| Best for | Trying the game out, short sessions. **Not suitable for full matches on Hobby.** | Real matches with friends (recommended) |
 
 ---
 

@@ -19,6 +19,7 @@ _Last updated: 2026-11-04_
 
 - **URL:** https://shadow-hunt-theta.vercel.app. This is a Vercel Services project (`web` + `game` container), built from `main`.
 - **Verified against production:** `/api/health` responds, two clients join one room over `wss://…/api/…`, and a headless browser joined by invite link and started a bot match with no page errors.
+- **Measured limitation:** a Vercel WebSocket is closed about 300 s after it opens (Hobby). The client reconnects immediately, but Vercel routes it to a different instance, and the room lives only in the original instance's memory, so the player is out of the room. Full matches therefore can't finish on Vercel Hobby. The fix is to host the game server on an always-on service (option B in docs/DEPLOYMENT.md) and keep Vercel for the web app.
 - **First build failed:** pnpm tried to clone `uWebSockets.js` over SSH, pulled in by the `colyseus` meta-package. The fix was to depend on `@colyseus/core` directly.
 
 ## Verified (commands actually run)
