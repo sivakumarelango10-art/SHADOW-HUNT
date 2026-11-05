@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node scripts/gen-audio.mjs && vite",
     "build": "node scripts/gen-audio.mjs && tsc --noEmit && vite build",
+    "build:artifact": "node scripts/gen-audio.mjs && vite build --mode artifact && node scripts/build-artifact.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "echo \"web: covered by e2e (pnpm e2e)\""

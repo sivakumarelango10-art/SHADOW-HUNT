@@ -16,6 +16,7 @@ import { CharacterPreview } from '../components/CharacterPreview';
 import { leaveRoom, send } from '../multiplayer/net';
 import { useRoom, type RoomSnapshot } from '../stores/room';
 import { useSession } from '../stores/session';
+import { OFFLINE } from '../services/api';
 import { audio } from '../game/audio/audio';
 import { abilityText } from '../game/hud/abilityText';
 
@@ -60,7 +61,7 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
           ← Leave
         </button>
         <div>
-          <div className="label">{snap.isPublic ? 'Public lobby' : 'Private room'}</div>
+          <div className="label">{OFFLINE ? 'Solo · bot hunter' : snap.isPublic ? 'Public lobby' : 'Private room'}</div>
           <button
             onClick={() => copy('code')}
             className="font-mono text-3xl tracking-[0.35em] text-bone transition hover:text-white"
@@ -69,7 +70,7 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
             {snap.code}
           </button>
         </div>
-        <div className="flex gap-2">
+        <div className={`flex gap-2 ${OFFLINE ? 'hidden' : ''}`}>
           <button className="btn" onClick={() => copy('code')}>
             {copied === 'code' ? 'Copied ✓' : 'Copy code'}
           </button>
@@ -131,7 +132,12 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
                 )}
               </div>
             ))}
-            {snap.players.length < 2 && (
+            {OFFLINE && (
+              <div className="rounded-lg border border-dashed border-line p-4 text-center text-sm text-dim">
+                Solo match against an AI hunter. Progress is saved in this browser.
+              </div>
+            )}
+            {!OFFLINE && snap.players.length < 2 && (
               <div className="rounded-lg border border-dashed border-line p-4 text-center text-sm text-dim">
                 Share the code — friends join from “Join Room”, or open the invite link.
               </div>
@@ -185,11 +191,13 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
             <p className="mt-2 text-xs text-ash">{def.perk ?? (def.ability ? abilityText(def.ability) : '')}</p>
           </div>
           <div className="mt-auto flex flex-col gap-2 pt-4">
-            <Toggle
-              label="I want to be the hunter"
-              value={me.preferHunter}
-              onChange={(v) => send('setPreferHunter', { prefer: v })}
-            />
+            {!OFFLINE && (
+              <Toggle
+                label="I want to be the hunter"
+                value={me.preferHunter}
+                onChange={(v) => send('setPreferHunter', { prefer: v })}
+              />
+            )}
             {!isHost && (
               <button className={`btn ${me.ready ? '' : 'btn-primary'}`} onClick={() => send('setReady', { ready: !me.ready })}>
                 {me.ready ? 'Not ready' : 'Ready up'}
@@ -235,7 +243,7 @@ export function Lobby({ snap }: { snap: RoomSnapshot }) {
                 onChange={(g) => send('setSettings', { generatorsRequired: g })}
               />
             </div>
-            <div className="flex items-center justify-between gap-2">
+            <div className={`flex items-center justify-between gap-2 ${OFFLINE ? 'hidden' : ''}`}>
               <span className="text-sm">Hunter</span>
               <Segmented
                 value={snap.hunterMode}

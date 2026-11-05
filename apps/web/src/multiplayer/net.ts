@@ -13,7 +13,7 @@ import {
   type SkillCheckResultMsg,
   type TrackMsg,
 } from '@shadow-hunt/shared';
-import { GAME_ENDPOINT } from '../services/api';
+import { GAME_ENDPOINT, OFFLINE } from '../services/api';
 import { useRoom, type PlayerView, type RoomSnapshot } from '../stores/room';
 import { useSession } from '../stores/session';
 import { clearSamples, pushSample } from '../game/systems/interpolation';
@@ -283,13 +283,25 @@ async function connect(fn: (c: Client, token: string) => Promise<Room>) {
   }
 }
 
+const ONLINE_ONLY = 'Joining other players needs the online version of the game.';
+function solo() {
+  const profile = useSession.getState().profile;
+  if (!profile) return Promise.reject(new Error('Profile not loaded yet.'));
+  return connect(async () => {
+    const { LocalRoom } = await import('../offline/localRoom');
+    return new LocalRoom(profile) as unknown as Room;
+  });
+}
 export const createRoom = (isPublic = false) =>
-  connect((c, token) => c.create('shadow_hunt', { token, mode: isPublic ? 'quick' : 'private', isPublic }));
-export const joinRoom = (code: string) => connect((c, token) => c.joinById(code.toUpperCase(), { token }));
-export const quickMatch = () => connect((c, token) => c.joinOrCreate('shadow_hunt', { token, mode: 'quick', isPublic: true }));
+  import.meta.env.VITE_OFFLINE === '1' ? solo() : connect((c, token) => c.create('shadow_hunt', { token, mode: isPublic ? 'quick' : 'private', isPublic }));
+export const joinRoom = (code: string) =>
+  OFFLINE ? Promise.reject(new Error(ONLINE_ONLY)) : connect((c, token) => c.joinById(code.toUpperCase(), { token }));
+export const quickMatch = () =>
+  OFFLINE ? Promise.reject(new Error(ONLINE_ONLY)) : connect((c, token) => c.joinOrCreate('shadow_hunt', { token, mode: 'quick', isPublic: true }));
 
 /** Re-attach after a page reload, if the server is still holding our seat. */
 export async function tryResume(): Promise<boolean> {
+  if (OFFLINE) return false;
   let saved: { token: string; at: number } | null;
   try {
     saved = JSON.parse(sessionStorage.getItem(RESUME_KEY) ?? 'null');

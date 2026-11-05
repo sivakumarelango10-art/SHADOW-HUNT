@@ -10,3 +10,4 @@ apps/web/public/audio/
 test-results
 *.log
 .DS_Store
+apps/web/dist-artifact

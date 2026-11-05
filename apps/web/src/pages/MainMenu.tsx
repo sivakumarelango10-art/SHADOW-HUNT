@@ -6,7 +6,7 @@ import { createRoom, joinRoom, quickMatch } from '../multiplayer/net';
 import { useRoom } from '../stores/room';
 import { useSession } from '../stores/session';
 import { useUi } from '../stores/ui';
-import { api } from '../services/api';
+import { api, OFFLINE } from '../services/api';
 
 export function MainMenu() {
   const profile = useSession((s) => s.profile);
@@ -109,17 +109,38 @@ export function MainMenu() {
                     exit={{ opacity: 0, x: 10 }}
                     className="flex flex-col gap-2.5"
                   >
-                    <MenuButton primary onClick={() => setPanel('play')} hint="Create · Join · Quick">
-                      Play
-                    </MenuButton>
+                    {OFFLINE ? (
+                      <MenuButton
+                        primary
+                        disabled={busy}
+                        onClick={() => run(() => createRoom(false))}
+                        hint="Solo · vs the bot hunter"
+                      >
+                        Play
+                      </MenuButton>
+                    ) : (
+                      <MenuButton primary onClick={() => setPanel('play')} hint="Create · Join · Quick">
+                        Play
+                      </MenuButton>
+                    )}
                     <div className="grid grid-cols-2 gap-2.5">
                       <MenuButton onClick={() => go('characters')}>Characters</MenuButton>
                       <MenuButton onClick={() => go('inventory')}>Inventory</MenuButton>
                       <MenuButton onClick={() => go('stats')}>Statistics</MenuButton>
-                      <MenuButton onClick={() => go('friends')}>Friends</MenuButton>
+                      {!OFFLINE && <MenuButton onClick={() => go('friends')}>Friends</MenuButton>}
                       <MenuButton onClick={() => go('settings')}>Settings</MenuButton>
                       <MenuButton onClick={() => go('profile')}>Profile</MenuButton>
                     </div>
+                    {OFFLINE && (
+                      <a
+                        className="mt-1 text-xs text-dim underline-offset-4 hover:text-bone hover:underline"
+                        href="https://shadow-hunt-theta.vercel.app"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Play online with friends at shadow-hunt-theta.vercel.app ↗
+                      </a>
+                    )}
                   </motion.div>
                 )}
                 {panel === 'play' && (
