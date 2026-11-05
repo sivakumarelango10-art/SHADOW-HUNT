@@ -75,7 +75,13 @@ export function registerRoutes(app: express.Application, jsonParser: express.Req
 
   app.get('/api/health', async (_req, res) => {
     const rooms = await matchMaker.query({});
-    res.json({ ok: true, store: getStore().kind, rooms: rooms.length, uptime: process.uptime() });
+    res.json({
+      ok: true,
+      store: getStore().kind,
+      guestSecret: config.guestSecretEphemeral ? 'ephemeral' : 'configured',
+      rooms: rooms.length,
+      uptime: process.uptime(),
+    });
   });
 
   app.post('/api/auth/guest', rateLimit(20, 60_000), jsonParser, async (req, res, next) => {

@@ -4,7 +4,7 @@
     "web": {
       "root": "apps/web",
       "framework": "vite",
-      "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+      "installCommand": "cd ../.. && npx --yes pnpm@10.28.0 install --frozen-lockfile",
       "buildCommand": "pnpm run build",
       "outputDirectory": "dist",
       "headers": [

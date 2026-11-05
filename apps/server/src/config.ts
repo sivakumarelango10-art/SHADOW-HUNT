@@ -6,10 +6,19 @@ import { log } from './utils/log.ts';
 const env = process.env;
 const isProd = env.NODE_ENV === 'production';
 
+/** True when guest tokens are signed with a per-process random key (they reset on restart). */
+let guestSecretEphemeral = false;
+
 function guestSecret(): string {
   if (env.GUEST_TOKEN_SECRET && env.GUEST_TOKEN_SECRET.length >= 32) return env.GUEST_TOKEN_SECRET;
   if (isProd) {
-    throw new Error('GUEST_TOKEN_SECRET (min 32 chars) must be set in production.');
+    // Keep the game playable on a fresh deploy instead of crashing: tokens stay unforgeable,
+    // but every guest gets a new identity whenever this server process restarts.
+    guestSecretEphemeral = true;
+    log.error(
+      'GUEST_TOKEN_SECRET (32+ chars) is not set — using a random per-process key; guest sessions reset on every restart.',
+    );
+    return randomBytes(32).toString('hex');
   }
   // Development: persist a generated secret so guest sessions survive server restarts.
   const dir = env.DATA_DIR ?? path.resolve(process.cwd(), 'data');
@@ -38,6 +47,9 @@ export const config = {
     .map((s) => s.trim())
     .filter(Boolean),
   guestTokenSecret: guestSecret(),
+  get guestSecretEphemeral() {
+    return guestSecretEphemeral;
+  },
   supabaseUrl: env.SUPABASE_URL ?? '',
   supabaseServiceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY ?? '',
   dataDir: env.DATA_DIR ?? path.resolve(process.cwd(), 'data'),

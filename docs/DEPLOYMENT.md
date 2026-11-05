@@ -41,8 +41,7 @@ There are no service bindings. The web app is static and talks to the game serve
 
    | Variable | Value |
    |---|---|
-   | `GUEST_TOKEN_SECRET` | Random 32+ characters (`openssl rand -hex 32`). **Required**: the game server will not start without it. Mark it *Sensitive*. |
-   | `ENABLE_EXPERIMENTAL_COREPACK` | `1`. Makes Vercel use the exact pnpm version pinned in `package.json`. |
+   | `GUEST_TOKEN_SECRET` | Random 32+ characters (`openssl rand -hex 32`), marked *Sensitive*. Without it the server still runs, but signs guest tokens with a random key per instance, so guests get a new identity whenever the instance restarts. `/api/health` shows `"guestSecret":"ephemeral"` until it is set. |
    | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Recommended (see section 1). Read only by the game server. |
    | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Optional; enables Google and email sign-in |
 
@@ -98,7 +97,7 @@ Environment variables (see `apps/server/.env.example`):
 
 | Variable | Required | Notes |
 |---|---|---|
-| `GUEST_TOKEN_SECRET` | **yes** | Random, 32+ characters. The server refuses to start in production without it. Changing it logs out all guests. |
+| `GUEST_TOKEN_SECRET` | **yes** | Random, 32+ characters. Without it, guest sessions reset whenever the server restarts. Changing it logs out all guests. |
 | `CORS_ORIGIN` | **yes** | Your web origin(s), comma separated, e.g. `https://shadow-hunt.vercel.app` |
 | `SUPABASE_URL` | recommended | Enables Supabase persistence and account sign-in |
 | `SUPABASE_SERVICE_ROLE_KEY` | recommended | Server only |
