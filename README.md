@@ -2,6 +2,8 @@
 
 *Stay together. Stay silent. Survive the hunt.*
 
+**Play now: https://shadow-hunt-theta.vercel.app**: open it, create a room and send friends the invite link.
+
 A browser-based, real-time multiplayer asymmetric horror game. One Hunter versus up to eight Survivors in first-person 3D. Survivors repair generators, find access keys, open an exit gate and escape. The Hunter tracks them by sound and blood, downs them and locks them in cages. It runs on desktop and on phones (landscape, touch controls). Friends join with a six-letter room code or an invite link.
 
 The server is authoritative. Clients only send inputs and intents. Movement, hits, captures, objectives, timers, results and XP are all simulated and validated on the Colyseus server.

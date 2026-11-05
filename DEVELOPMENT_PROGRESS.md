@@ -13,7 +13,13 @@ _Last updated: 2026-11-04_
 | 5. Horror environment | ✅ Done | Both maps render (e2e screenshots); flashlight, fog, pooled lights, procedural audio |
 | 6. Advanced features | ✅ Done | 3 hunter abilities, progression, achievements, stats, friends, reconnection, spectator, bot hunter |
 | 7. Optimization | 🟡 Partial | Instancing, merged geometry, light pool, quality presets, adaptive quality. **Not profiled on real GPUs or phones.** |
-| 8. Testing & deployment | 🟡 Partial | 32 unit/integration tests and the browser e2e pass. Deploy configs written. **Not deployed; Supabase not exercised live.** |
+| 8. Testing & deployment | ✅ Deployed | 32 unit/integration tests and the browser e2e pass. Deploy configs written. **Not deployed; Supabase not exercised live.** |
+
+## Live deployment
+
+- **URL:** https://shadow-hunt-theta.vercel.app. This is a Vercel Services project (`web` + `game` container), built from `main`.
+- **Verified against production:** `/api/health` responds, two clients join one room over `wss://…/api/…`, and a headless browser joined by invite link and started a bot match with no page errors.
+- **First build failed:** pnpm tried to clone `uWebSockets.js` over SSH, pulled in by the `colyseus` meta-package. The fix was to depend on `@colyseus/core` directly.
 
 ## Verified (commands actually run)
 

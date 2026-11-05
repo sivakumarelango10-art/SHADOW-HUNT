@@ -46,7 +46,9 @@ There are no service bindings. The web app is static and talks to the game serve
    | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Optional; enables Google and email sign-in |
 
    Do **not** set `VITE_SERVER_URL` or `CORS_ORIGIN`: the browser and the game server share one origin.
-3. **Deploy.** Check `https://<project>.vercel.app/api/health`. It returns `{"ok":true,…}` once the container is up.
+3. **Deploy.** Check `https://<production-domain>/api/health`. It returns `{"ok":true,…}` once the container is up; the first request after an idle period cold-starts it in about 1–2 s.
+   - The production domain is listed under the project's **Domains**. If `<project>.vercel.app` is already taken by someone else, Vercel adds a suffix; this project got `shadow-hunt-theta.vercel.app`.
+   - The team-suffixed URLs (`<project>-<team>.vercel.app`, per-deployment URLs) sit behind Vercel Authentication, so share the production domain or a custom domain with players.
 4. **Supabase redirect URLs:** add the Vercel URL in Supabase → Authentication → URL Configuration.
 
 ### Local check of the same routing
