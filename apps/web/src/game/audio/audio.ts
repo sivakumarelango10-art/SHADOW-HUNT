@@ -45,15 +45,18 @@ const MUSIC = ['ambient_forest', 'ambient_asylum', 'music_tension', 'music_chase
 export type SfxName = (typeof SFX)[number];
 export type MusicName = (typeof MUSIC)[number];
 
+/** The single-file artifact build embeds every sound as a data: URI in `window.__SH_AUDIO`. */
+const audioSrc = (n: string): string =>
+  (globalThis as { __SH_AUDIO?: Record<string, string> }).__SH_AUDIO?.[n] ?? `${import.meta.env.BASE_URL}audio/${n}.wav`;
+
 const howls = new Map<string, Howl>();
 let loaded = false;
 
 function load() {
   if (loaded) return;
   loaded = true;
-  for (const n of SFX)
-    howls.set(n, new Howl({ src: [`/audio/${n}.wav`], preload: true, loop: n === 'gen_loop' || n === 'heartbeat' }));
-  for (const n of MUSIC) howls.set(n, new Howl({ src: [`/audio/${n}.wav`], preload: true, loop: true, volume: 0 }));
+  for (const n of SFX) howls.set(n, new Howl({ src: [audioSrc(n)], preload: true, loop: n === 'gen_loop' || n === 'heartbeat' }));
+  for (const n of MUSIC) howls.set(n, new Howl({ src: [audioSrc(n)], preload: true, loop: true, volume: 0 }));
   applyVolumes();
 }
 

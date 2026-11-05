@@ -1,4 +1,8 @@
 import { API_PREFIX, type FriendEntry, type MatchHistoryEntry, type Profile } from '@shadow-hunt/shared';
+import { localApi } from '../offline/localApi';
+
+/** Artifact build: everything runs in the page (solo vs the bot hunter), no game server. */
+export const OFFLINE = import.meta.env.VITE_OFFLINE === '1';
 
 /**
  * Where the game server lives:
@@ -61,7 +65,7 @@ export interface RoomInfo {
   joinable?: boolean;
 }
 
-export const api = {
+const remoteApi = {
   health: () => request<{ ok: boolean; store: string }>('GET', '/api/health'),
   guest: (name?: string) => request<{ token: string; profile: Profile }>('POST', '/api/auth/guest', { name }),
   profile: () => request<{ profile: Profile }>('GET', '/api/profile'),
@@ -77,3 +81,5 @@ export const api = {
   removeFriend: (id: string) => request<{ ok: boolean }>('DELETE', `/api/friends/${encodeURIComponent(id)}`),
   room: (code: string) => request<RoomInfo>('GET', `/api/rooms/${encodeURIComponent(code)}`),
 };
+
+export const api: typeof remoteApi = OFFLINE ? (localApi as unknown as typeof remoteApi) : remoteApi;

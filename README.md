@@ -124,6 +124,7 @@ The prompt suggested three shared packages. I merged them into a single `package
 | `vercel dev` | Both Vercel services with production routing (needs Docker for the game container) |
 | `pnpm build` | Bundles the server to `apps/server/dist`, generates audio, then type-checks and builds the client to `apps/web/dist` |
 | `pnpm test` | Shared unit tests and server tests (real sockets and simulation) |
+| `pnpm --filter @shadow-hunt/web build:artifact` | Server-free solo build (you against the bot Hunter): the real simulation runs in the page, and everything is packed into `apps/web/dist-artifact/shadow-hunt.html` |
 | `pnpm e2e` | Starts everything and drives real headless Chrome browsers through a match, with screenshots in `test-results/` |
 | `pnpm lint` / `pnpm typecheck` | ESLint / TypeScript |
 
