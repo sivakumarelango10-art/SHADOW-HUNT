@@ -3,6 +3,8 @@ dist
 .env
 .env.*
 !.env.example
+# Public Vite build config (VITE_* values ship in the bundle anyway)
+!apps/web/.env.production
 apps/server/data/
 apps/web/public/audio/
 test-results

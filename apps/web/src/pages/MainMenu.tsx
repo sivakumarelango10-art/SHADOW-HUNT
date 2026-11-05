@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { isValidRoomCode, levelProgress, normalizeRoomCode } from '@shadow-hunt/shared';
 import { Avatar, MenuButton, Spinner } from '../components/ui';
@@ -98,9 +98,7 @@ export function MainMenu() {
                 </button>
               </div>
             ) : status !== 'ready' ? (
-              <div className="flex items-center gap-3 text-sm text-ash">
-                <Spinner /> Waking the dark…
-              </div>
+              <WakingNotice />
             ) : (
               <AnimatePresence mode="wait">
                 {panel === 'none' && (
@@ -198,5 +196,24 @@ export function MainMenu() {
         Headphones recommended · WASD + mouse or touch
       </footer>
     </motion.div>
+  );
+}
+
+/** The free game server sleeps when idle; the first visit after that takes about a minute. */
+function WakingNotice() {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSlow(true), 4000);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <div className="flex flex-col gap-1 text-sm text-ash">
+      <div className="flex items-center gap-3">
+        <Spinner /> Waking the dark…
+      </div>
+      {slow && (
+        <p className="text-xs text-dim">The game server is starting up. After a quiet spell this can take up to a minute.</p>
+      )}
+    </div>
   );
 }
