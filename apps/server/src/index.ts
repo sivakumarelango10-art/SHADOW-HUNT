@@ -1,6 +1,6 @@
 import type { IncomingMessage } from 'node:http';
 import express from 'express';
-import { Server } from '@colyseus/core';
+import { Server, matchMaker } from '@colyseus/core';
 import { WebSocketTransport } from '@colyseus/ws-transport';
 import { API_PREFIX } from '@shadow-hunt/shared';
 import { config } from './config.ts';
@@ -9,7 +9,25 @@ import { ShadowHuntRoom } from './rooms/ShadowHuntRoom.ts';
 import { getStore } from './services/store.ts';
 import { log } from './utils/log.ts';
 
+/**
+ * Colyseus answers every request (and every CORS preflight) itself and, by default, echoes
+ * back any Origin. Apply the same allow-list as the REST API instead. Same-origin deployments
+ * (CORS_ORIGIN unset in production) are unaffected because browsers skip CORS for them.
+ */
+function applyCorsPolicy() {
+  const allowAll = config.corsOrigins.includes('*');
+  matchMaker.controller.getCorsHeaders = (headers: Headers) => {
+    const origin = headers.get('origin');
+    const allowed = !!origin && (allowAll || config.corsOrigins.includes(origin));
+    return {
+      'Access-Control-Allow-Origin': allowed ? origin! : (config.corsOrigins.find((o) => o !== '*') ?? 'null'),
+      Vary: 'Origin',
+    };
+  };
+}
+
 export function createGameServer() {
+  applyCorsPolicy();
   const server = new Server({
     transport: new WebSocketTransport({ pingInterval: 4000, pingMaxRetries: 3 }),
     greet: false,
