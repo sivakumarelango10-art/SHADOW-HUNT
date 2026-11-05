@@ -1,6 +1,6 @@
 import type { IncomingMessage } from 'node:http';
 import express from 'express';
-import { Server } from 'colyseus';
+import { Server } from '@colyseus/core';
 import { WebSocketTransport } from '@colyseus/ws-transport';
 import { API_PREFIX } from '@shadow-hunt/shared';
 import { config } from './config.ts';

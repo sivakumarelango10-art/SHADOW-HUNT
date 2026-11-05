@@ -1,5 +1,5 @@
 import { randomInt } from 'node:crypto';
-import { Room, ServerError, type Client } from 'colyseus';
+import { Room, ServerError, type Client } from '@colyseus/core';
 import {
   C2S,
   CHARACTERS,

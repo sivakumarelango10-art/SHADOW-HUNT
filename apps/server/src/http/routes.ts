@@ -1,5 +1,5 @@
 import type express from 'express';
-import { matchMaker } from 'colyseus';
+import { matchMaker } from '@colyseus/core';
 import {
   AVATARS,
   CHARACTERS,

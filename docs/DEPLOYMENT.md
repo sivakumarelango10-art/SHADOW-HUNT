@@ -5,7 +5,7 @@ There are three parts:
 | Part | What it is |
 |---|---|
 | Web client | Static Vite build (`apps/web`) |
-| Game server | Colyseus WebSocket server + REST API (`apps/server`, built by the root `Dockerfile`), served under `/api` |
+| Game server | Colyseus WebSocket server + REST API (`apps/server`, `@colyseus/core` + ws transport, built by the root `Dockerfile`), served under `/api` |
 | Database and auth | **Supabase**: Postgres + Auth (strongly recommended in production) |
 
 Without Supabase the server falls back to a local JSON file. That is fine for one long-lived machine. On hosts whose disk is wiped when an instance stops (including Vercel), progress is lost. Google and email sign-in also stay disabled; guests can still play.

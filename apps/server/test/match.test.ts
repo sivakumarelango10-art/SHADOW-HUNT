@@ -6,7 +6,7 @@
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Client, type Room } from '@colyseus/sdk';
-import { matchMaker } from 'colyseus';
+import { matchMaker } from '@colyseus/core';
 import { C2S, MAPS, S2C, type MatchResults, type SkillCheckMsg } from '@shadow-hunt/shared';
 import { startGameServer } from '../src/index.ts';
 import type { ShadowHuntRoom } from '../src/rooms/ShadowHuntRoom.ts';
