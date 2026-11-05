@@ -2,7 +2,7 @@
 
 *Stay together. Stay silent. Survive the hunt.*
 
-**Live: https://shadow-hunt-theta.vercel.app**. Note: while the game server runs on Vercel Hobby, players are dropped from their room about 5 minutes after joining. See docs/DEPLOYMENT.md for the always-on server option.
+**Play: https://shadow-hunt-theta.vercel.app**. Create a room and send friends the invite link. The website runs on Vercel and the game server on Render's free plan, so after a quiet spell the first visit takes about a minute to wake the server.
 
 A browser-based, real-time multiplayer asymmetric horror game. One Hunter versus up to eight Survivors in first-person 3D. Survivors repair generators, find access keys, open an exit gate and escape. The Hunter tracks them by sound and blood, downs them and locks them in cages. It runs on desktop and on phones (landscape, touch controls). Friends join with a six-letter room code or an invite link.
 
@@ -129,4 +129,4 @@ The prompt suggested three shared packages. I merged them into a single `package
 
 ## Status
 
-See **DEVELOPMENT_PROGRESS.md** for what is verified, the test results and known limitations. See **docs/ARCHITECTURE.md** for the networking model. See **docs/DEPLOYMENT.md** to put the game online. The repo includes a Vercel Services `vercel.json` that serves the web app and the game server (under `/api`) from one Vercel project. You can also host the game server separately on Railway, Render or Fly.
+See **DEVELOPMENT_PROGRESS.md** for what is verified, the test results and known limitations. See **docs/ARCHITECTURE.md** for the networking model. See **docs/DEPLOYMENT.md** to put the game online. The website deploys to Vercel (`vercel.json`) and the game server to Render (`render.yaml`). Railway and Fly configs are included too.

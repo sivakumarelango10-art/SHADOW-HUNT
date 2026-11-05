@@ -10,62 +10,45 @@ There are three parts:
 
 Without Supabase the server falls back to a local JSON file. That is fine for one long-lived machine. On hosts whose disk is wiped when an instance stops (including Vercel), progress is lost. Google and email sign-in also stay disabled; guests can still play.
 
-There are two ways to host it:
+## Current production setup
 
-| | **A. Everything on Vercel (Services)** | **B. Web on Vercel, game server elsewhere** |
+| Part | Host | URL |
 |---|---|---|
-| Config | Root `vercel.json` (already in the repo) | Web-only Vercel project + Railway / Render / Fly |
-| Domain | One URL; `/api/*` goes to the game server | Two URLs; set `VITE_SERVER_URL` and `CORS_ORIGIN` |
-| WebSockets | Closed at the Vercel Function max duration (**5 min on Hobby**, 800 s on Pro, up to 30 min in the Pro beta) | No duration limit |
-| Rooms | In memory on one instance. **Measured on the live deployment (Hobby):** after the 5-minute cut, the reconnect reached a *different* instance while the original one was still running, so the room was gone. Every player loses their room about 5 minutes after joining it (lobby time included), so full 8–15 minute matches cannot finish. | One always-on process; reconnects return to the same room |
-| Idle | Instance stops after 5 idle minutes (fine between sessions) | Always on |
-| Best for | Trying the game out, short sessions. **Not suitable for full matches on Hobby.** | Real matches with friends (recommended) |
+| Website (`web` service in `vercel.json`) | Vercel (Hobby) | https://shadow-hunt-theta.vercel.app |
+| Game server (root `Dockerfile`, `render.yaml`) | Render (free, Singapore) | https://shadowhunt-server.onrender.com |
+| Database | none yet; add Supabase to keep progress | |
+
+The website is built with `VITE_SERVER_URL` from `apps/web/.env.production` (public config, compiled into the bundle). The browser calls the game server directly: REST at `/api/*`, matchmaking at `/api/matchmake/*`, and the WebSocket at `wss://…/api/<process>/<room>`. The game server only accepts browser requests from the Vercel domains listed in `CORS_ORIGIN` (`render.yaml`).
+
+**Free-tier behaviour:**
+- Render spins the game server down after 15 minutes with no traffic, and the next visitor waits about a minute while it wakes. The menu shows "The game server is starting up…" during that time.
+- WebSocket traffic during a match keeps it awake, and there is no connection time limit.
+- Its disk is wiped on spin-down, so profiles and XP reset unless Supabase is configured (section 1). Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in the Render dashboard.
+
+### Why the game server is not on Vercel
+
+The first deployment ran everything on Vercel Services (website + game server as a `container` service behind `/api/(.*)`). A live test on Hobby showed:
+
+- Vercel closes each WebSocket about 300 s after it opens (the Function max duration).
+- The client reconnects immediately, but the reconnect is routed to a **different instance** while the original one is still running.
+- The room lives only in the original instance's memory, so the player is out of the match about 5 minutes after joining. Full 8–15 minute matches cannot finish.
+
+Pro raises the limit (800 s, or 30 min in beta) but the reconnect problem stays. To try that setup anyway, add back to `vercel.json`:
+
+```json
+"game": { "root": ".", "framework": "container", "runtime": "container", "entrypoint": "Dockerfile" }
+```
+
+Add `{ "source": "/api/(.*)", "destination": { "service": "game" } }` before the catch-all rewrite, delete `apps/web/.env.production`, and leave `CORS_ORIGIN` unset (same origin).
 
 ---
 
-## A. Everything on Vercel (Services)
+## Setting it up from scratch
 
-`vercel.json` at the repository root defines two services:
-
-| Service | Root | Built as | Public path |
-|---|---|---|---|
-| `web` | `apps/web` | Vite static build | `/(.*)` (everything not matched above) |
-| `game` | `.` | Container from the root `Dockerfile` | `/api/(.*)`: REST, matchmaking and WebSockets |
-
-There are no service bindings. The web app is static and talks to the game server from the browser over the public `/api` route. The game server calls no other service; Supabase is external.
-
-### Setup
-
-1. **Import the repository** at vercel.com → *Add New → Project*. Leave the Root Directory as the repository root; Vercel reads `vercel.json` and builds both services.
-2. **Environment variables** (Settings → Environment Variables, Production + Preview):
-
-   | Variable | Value |
-   |---|---|
-   | `GUEST_TOKEN_SECRET` | Random 32+ characters (`openssl rand -hex 32`), marked *Sensitive*. Without it the server still runs, but signs guest tokens with a random key per instance, so guests get a new identity whenever the instance restarts. `/api/health` shows `"guestSecret":"ephemeral"` until it is set. |
-   | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Recommended (see section 1). Read only by the game server. |
-   | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Optional; enables Google and email sign-in |
-
-   Do **not** set `VITE_SERVER_URL` or `CORS_ORIGIN`: the browser and the game server share one origin.
-3. **Deploy.** Check `https://<production-domain>/api/health`. It returns `{"ok":true,…}` once the container is up; the first request after an idle period cold-starts it in about 1–2 s.
-   - The production domain is listed under the project's **Domains**. If `<project>.vercel.app` is already taken by someone else, Vercel adds a suffix; this project got `shadow-hunt-theta.vercel.app`.
-   - The team-suffixed URLs (`<project>-<team>.vercel.app`, per-deployment URLs) sit behind Vercel Authentication, so share the production domain or a custom domain with players.
-4. **Supabase redirect URLs:** add the Vercel URL in Supabase → Authentication → URL Configuration.
-
-### Local check of the same routing
-
-`vercel dev` runs both services together and needs the Docker daemon for the `game` container. Without Docker, `pnpm dev` runs the same code: the game server on `:2567` and Vite on `:5173`.
-
----
-
-## B. Web on Vercel, game server on Railway / Render / Fly
-
-Use this when you need matches longer than the WebSocket duration limit, or more players than one instance comfortably holds.
-
-1. Deploy the game server with the root `Dockerfile` (section 2 below).
-2. In Vercel, delete the `game` service and the `/api/(.*)` rewrite from `vercel.json`, leaving only `web` behind the catch-all rewrite.
-3. Set `VITE_SERVER_URL=https://<your-game-server>` in Vercel and `CORS_ORIGIN=https://<your-vercel-domain>` on the game server.
-
----
+1. **Game server on Render.** Go to *New → Blueprint* and pick the repository. `render.yaml` creates `shadowhunt-server` (free, Docker, health check `/api/health`), generates `GUEST_TOKEN_SECRET`, and sets `CORS_ORIGIN` to the Vercel domains. Edit `CORS_ORIGIN` if your Vercel domain differs.
+2. **Website on Vercel.** Go to *Add New → Project*, import the repository, and keep the Root Directory as `./`. `vercel.json` builds the `web` service. Point `apps/web/.env.production` at your Render URL. You can also set `VITE_SERVER_URL` in Vercel's environment variables, which takes precedence.
+3. **Optional:** Supabase (section 1). Add its server variables on Render and `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` on Vercel.
+4. **Share the production domain.** The team-suffixed Vercel URLs (`<project>-<team>.vercel.app` and per-deployment URLs) sit behind Vercel Authentication. If `<project>.vercel.app` is taken, Vercel adds a suffix (this project got `shadow-hunt-theta.vercel.app`).
 
 ## 1. Supabase
 
@@ -121,7 +104,9 @@ The image listens on port 80 by default (what Vercel expects). Railway, Render a
 
 ### Render
 
-Use **New → Blueprint** and point it at the repository. `render.yaml` creates the service and generates `GUEST_TOKEN_SECRET`. Fill in `CORS_ORIGIN`, `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. Choose a paid instance: free instances sleep, and a sleeping server drops every live match.
+Go to **New → Blueprint** and point it at the repository. `render.yaml` creates `shadowhunt-server` on the free plan, generates `GUEST_TOKEN_SECRET` and sets `CORS_ORIGIN`. Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in the dashboard to keep progress.
+
+The free plan sleeps after 15 idle minutes and takes about a minute to wake. If you want it always on with no wake-up wait, switch to a paid instance (*Starter*).
 
 ### Fly.io
 
@@ -134,11 +119,11 @@ fly deploy
 
 `fly.toml` keeps one machine always running (`auto_stop_machines = "off"`). Pick a `primary_region` close to your players. It is set to `bom` (Mumbai) by default.
 
-## 3. Web client only (Vercel, option B)
+## 3. Web client (Vercel)
 
-1. **New Project**: import the repository. Keep the root `vercel.json` with only the `web` service; it installs from the monorepo root and outputs `apps/web/dist`.
+1. **New Project**: import the repository. The root `vercel.json` defines the `web` service; it installs from the monorepo root and outputs `apps/web/dist`.
 2. Set the environment variables:
-   - `VITE_SERVER_URL` = `https://<your-game-server-domain>`. WebSockets automatically use `wss://`.
+   - `VITE_SERVER_URL` = `https://<your-game-server-domain>`. This is already set in `apps/web/.env.production`; a Vercel variable overrides it. WebSockets automatically use `wss://`.
    - `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. These are optional; without them the Profile page shows guest-only play.
 3. Deploy. Then put the Vercel URL into the server's `CORS_ORIGIN` and into Supabase's redirect URLs.
 
