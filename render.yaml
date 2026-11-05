@@ -1,19 +1,27 @@
-# Render Blueprint — persistent Node web service for the game server.
+# Render Blueprint for the Shadow Hunt game server (Colyseus + REST API, all under /api).
+# Render → New → Blueprint → pick this repository. The website stays on Vercel.
+#
+# Free instances run a single always-on process while in use (WebSocket traffic keeps
+# them awake), spin down after 15 idle minutes and take about a minute to wake.
+# Their disk is wiped on spin-down: set SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY in the
+# Render dashboard to keep player progress.
 services:
   - type: web
-    name: shadow-hunt-server
+    name: shadowhunt-server
     runtime: docker
     dockerfilePath: ./Dockerfile
-    plan: starter
+    dockerContext: .
+    plan: free
+    region: singapore
     healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: "10000"
       - key: GUEST_TOKEN_SECRET
         generateValue: true
+      # Browser origins allowed to call the REST API (the Vercel site).
       - key: CORS_ORIGIN
-        sync: false
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_ROLE_KEY
-        sync: false
+        value: https://shadow-hunt-theta.vercel.app,https://shadow-hunt-sivakumarelango10-6288s-projects.vercel.app,https://shadow-hunt-git-main-sivakumarelango10-6288s-projects.vercel.app
