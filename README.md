@@ -119,6 +119,7 @@ The prompt suggested three shared packages. I merged them into a single `package
 | Command | What it does |
 |---|---|
 | `pnpm dev` | Server (tsx watch) and client (Vite) |
+| `vercel dev` | Both Vercel services with production routing (needs Docker for the game container) |
 | `pnpm build` | Bundles the server to `apps/server/dist`, generates audio, then type-checks and builds the client to `apps/web/dist` |
 | `pnpm test` | Shared unit tests and server tests (real sockets and simulation) |
 | `pnpm e2e` | Starts everything and drives real headless Chrome browsers through a match, with screenshots in `test-results/` |
@@ -126,4 +127,4 @@ The prompt suggested three shared packages. I merged them into a single `package
 
 ## Status
 
-See **DEVELOPMENT_PROGRESS.md** for what is verified, the test results and known limitations. See **docs/ARCHITECTURE.md** for the networking model. See **docs/DEPLOYMENT.md** to put the game online (Vercel, Railway/Render/Fly and Supabase).
+See **DEVELOPMENT_PROGRESS.md** for what is verified, the test results and known limitations. See **docs/ARCHITECTURE.md** for the networking model. See **docs/DEPLOYMENT.md** to put the game online. The repo includes a Vercel Services `vercel.json` that serves the web app and the game server (under `/api`) from one Vercel project. You can also host the game server separately on Railway, Render or Fly.

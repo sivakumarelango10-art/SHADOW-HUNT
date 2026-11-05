@@ -1,12 +1,20 @@
-import type { FriendEntry, MatchHistoryEntry, Profile } from '@shadow-hunt/shared';
+import { API_PREFIX, type FriendEntry, type MatchHistoryEntry, type Profile } from '@shadow-hunt/shared';
 
+/**
+ * Where the game server lives:
+ *  - VITE_SERVER_URL, if set (game server hosted on another domain, e.g. Railway/Render/Fly);
+ *  - otherwise in production the same origin as the page (Vercel Services routes /api/* to it);
+ *  - in `vite dev`, the standalone dev server on port 2567 of the same host (works from phones on the LAN).
+ */
 function defaultServer(): string {
   if (typeof location === 'undefined') return 'http://localhost:2567';
-  return `${location.protocol}//${location.hostname}:2567`;
+  if (import.meta.env.DEV) return `${location.protocol}//${location.hostname}:2567`;
+  return location.origin;
 }
 
 export const SERVER_URL = (import.meta.env.VITE_SERVER_URL || defaultServer()).replace(/\/$/, '');
-export const WS_URL = SERVER_URL.replace(/^http/, 'ws');
+/** Colyseus endpoint: matchmaking at `<this>/matchmake/…`, rooms at `<this>/<process>/<room>` (wss on https). */
+export const GAME_ENDPOINT = `${SERVER_URL}${API_PREFIX}`;
 
 export class ApiError extends Error {
   constructor(

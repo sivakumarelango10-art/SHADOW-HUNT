@@ -1,6 +1,8 @@
+import type { IncomingMessage } from 'node:http';
 import express from 'express';
 import { Server } from 'colyseus';
 import { WebSocketTransport } from '@colyseus/ws-transport';
+import { API_PREFIX } from '@shadow-hunt/shared';
 import { config } from './config.ts';
 import { registerRoutes } from './http/routes.ts';
 import { ShadowHuntRoom } from './rooms/ShadowHuntRoom.ts';
@@ -21,10 +23,33 @@ export function createGameServer() {
   return server;
 }
 
+/**
+ * Everything the game server serves lives under `/api` so a single public route
+ * (`/api/(.*)` on Vercel, or any reverse proxy) reaches it:
+ *   - REST:         /api/health, /api/profile, …
+ *   - matchmaking:  /api/matchmake/:method/:room  (Colyseus serves /matchmake/… natively)
+ *   - WebSockets:   /api/:processId/:roomId       (the WS transport only reads the last two segments)
+ * The client SDK is pointed at `<origin>/api`, so only matchmaking needs translating here.
+ */
+const MATCHMAKE_PREFIX = `${API_PREFIX}/matchmake/`;
+function stripApiPrefixForMatchmaking(req: IncomingMessage) {
+  if (req.url?.startsWith(MATCHMAKE_PREFIX)) req.url = req.url.slice(API_PREFIX.length);
+}
+
+/** Start listening and install the `/api` prefix translation. Must run after `listen()`. */
+export async function startGameServer(port: number | string) {
+  const server = createGameServer();
+  await server.listen(port);
+  const http = server.transport.server;
+  if (!http) throw new Error('WebSocketTransport has no HTTP server');
+  // Colyseus prepends its own request listeners during listen(); ours must run before them.
+  http.prependListener('request', stripApiPrefixForMatchmaking);
+  return server;
+}
+
 const isMain = import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith('dist/index.js');
 if (isMain) {
   getStore();
-  const server = createGameServer();
-  await server.listen(config.port);
-  log.info(`Shadow Hunt server listening on :${config.port}`, { cors: config.corsOrigins.join(',') || '(none)' });
+  await startGameServer(config.port);
+  log.info(`Shadow Hunt server listening on :${config.port}`, { cors: config.corsOrigins.join(',') || '(same-origin only)' });
 }

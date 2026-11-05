@@ -2,13 +2,67 @@
 
 There are three parts:
 
-| Part | What it is | Where it goes |
-|---|---|---|
-| Web client | Static site | **Vercel** |
-| Game server | Persistent WebSocket Node process | **Railway**, **Render** or **Fly.io**. Not Vercel functions: rooms live in server memory and need long-lived sockets. |
-| Database and auth | Postgres and Auth | **Supabase** (optional but recommended) |
+| Part | What it is |
+|---|---|
+| Web client | Static Vite build (`apps/web`) |
+| Game server | Colyseus WebSocket server + REST API (`apps/server`, built by the root `Dockerfile`), served under `/api` |
+| Database and auth | **Supabase**: Postgres + Auth (strongly recommended in production) |
 
-Without Supabase the server falls back to a local JSON file. That works on a single machine with a persistent disk, but progress is lost on hosts with ephemeral filesystems. Google and email sign-in also stay disabled; guests can still play.
+Without Supabase the server falls back to a local JSON file. That is fine for one long-lived machine. On hosts whose disk is wiped when an instance stops (including Vercel), progress is lost. Google and email sign-in also stay disabled; guests can still play.
+
+There are two ways to host it:
+
+| | **A. Everything on Vercel (Services)** | **B. Web on Vercel, game server elsewhere** |
+|---|---|---|
+| Config | Root `vercel.json` (already in the repo) | Web-only Vercel project + Railway / Render / Fly |
+| Domain | One URL; `/api/*` goes to the game server | Two URLs; set `VITE_SERVER_URL` and `CORS_ORIGIN` |
+| WebSockets | Closed at the Vercel Function max duration (**5 min on Hobby**, 800 s on Pro). Clients reconnect automatically to the same seat. | No duration limit |
+| Rooms | In memory on one instance. If Vercel starts a second instance (traffic spike or a deploy mid-match), players reconnecting there lose their room. | One always-on process |
+| Idle | Instance stops after 5 idle minutes (fine between sessions) | Always on |
+| Best for | Casual sessions with friends, one URL, no extra accounts | Reliable long matches, more players |
+
+---
+
+## A. Everything on Vercel (Services)
+
+`vercel.json` at the repository root defines two services:
+
+| Service | Root | Built as | Public path |
+|---|---|---|---|
+| `web` | `apps/web` | Vite static build | `/(.*)` (everything not matched above) |
+| `game` | `.` | Container from the root `Dockerfile` | `/api/(.*)`: REST, matchmaking and WebSockets |
+
+There are no service bindings. The web app is static and talks to the game server from the browser over the public `/api` route. The game server calls no other service; Supabase is external.
+
+### Setup
+
+1. **Import the repository** at vercel.com → *Add New → Project*. Leave the Root Directory as the repository root; Vercel reads `vercel.json` and builds both services.
+2. **Environment variables** (Settings → Environment Variables, Production + Preview):
+
+   | Variable | Value |
+   |---|---|
+   | `GUEST_TOKEN_SECRET` | Random 32+ characters (`openssl rand -hex 32`). **Required**: the game server will not start without it. Mark it *Sensitive*. |
+   | `ENABLE_EXPERIMENTAL_COREPACK` | `1`. Makes Vercel use the exact pnpm version pinned in `package.json`. |
+   | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Recommended (see section 1). Read only by the game server. |
+   | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Optional; enables Google and email sign-in |
+
+   Do **not** set `VITE_SERVER_URL` or `CORS_ORIGIN`: the browser and the game server share one origin.
+3. **Deploy.** Check `https://<project>.vercel.app/api/health`. It returns `{"ok":true,…}` once the container is up.
+4. **Supabase redirect URLs:** add the Vercel URL in Supabase → Authentication → URL Configuration.
+
+### Local check of the same routing
+
+`vercel dev` runs both services together and needs the Docker daemon for the `game` container. Without Docker, `pnpm dev` runs the same code: the game server on `:2567` and Vite on `:5173`.
+
+---
+
+## B. Web on Vercel, game server on Railway / Render / Fly
+
+Use this when you need matches longer than the WebSocket duration limit, or more players than one instance comfortably holds.
+
+1. Deploy the game server with the root `Dockerfile` (section 2 below).
+2. In Vercel, delete the `game` service and the `/api/(.*)` rewrite from `vercel.json`, leaving only `web` behind the catch-all rewrite.
+3. Set `VITE_SERVER_URL=https://<your-game-server>` in Vercel and `CORS_ORIGIN=https://<your-vercel-domain>` on the game server.
 
 ---
 
@@ -55,6 +109,8 @@ Generate a secret with `openssl rand -hex 32`.
 
 Health check: `GET /api/health` returns `{"ok":true,"store":"supabase",…}`.
 
+The image listens on port 80 by default (what Vercel expects). Railway, Render and Fly inject their own `PORT`.
+
 ### Railway
 
 1. Create a New Project from your GitHub repository. `railway.json` selects the Dockerfile.
@@ -77,9 +133,9 @@ fly deploy
 
 `fly.toml` keeps one machine always running (`auto_stop_machines = "off"`). Pick a `primary_region` close to your players. It is set to `bom` (Mumbai) by default.
 
-## 3. Web client (Vercel)
+## 3. Web client only (Vercel, option B)
 
-1. **New Project**: import the repository and set **Root Directory** to `apps/web`. `apps/web/vercel.json` installs from the monorepo root and outputs `dist`.
+1. **New Project**: import the repository. Keep the root `vercel.json` with only the `web` service; it installs from the monorepo root and outputs `apps/web/dist`.
 2. Set the environment variables:
    - `VITE_SERVER_URL` = `https://<your-game-server-domain>`. WebSockets automatically use `wss://`.
    - `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. These are optional; without them the Profile page shows guest-only play.

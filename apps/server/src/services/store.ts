@@ -103,6 +103,7 @@ export class FileStore implements Store {
   private db: FileDb = { profiles: {}, history: {}, matches: [], friends: {} };
   private file: string | null;
   private writeTimer: NodeJS.Timeout | null = null;
+  private warnedWrite = false;
 
   constructor(dir: string | null) {
     this.kind = dir ? 'file' : 'memory';
@@ -122,10 +123,16 @@ export class FileStore implements Store {
     this.writeTimer = setTimeout(() => {
       this.writeTimer = null;
       const file = this.file!;
-      fs.mkdirSync(path.dirname(file), { recursive: true });
-      const tmp = `${file}.tmp`;
-      fs.writeFileSync(tmp, JSON.stringify(this.db));
-      fs.renameSync(tmp, file);
+      try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        const tmp = `${file}.tmp`;
+        fs.writeFileSync(tmp, JSON.stringify(this.db));
+        fs.renameSync(tmp, file);
+      } catch (e) {
+        // A read-only or ephemeral disk must never take the game server down; data stays in memory.
+        if (!this.warnedWrite) log.error('dev file store could not write — keeping data in memory only', { error: String(e) });
+        this.warnedWrite = true;
+      }
     }, 250);
   }
 

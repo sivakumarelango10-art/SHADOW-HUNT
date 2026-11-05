@@ -157,3 +157,9 @@ export interface JoinOptions {
   mode?: 'quick' | 'private';
   characterId?: CharacterId;
 }
+
+/**
+ * Every game-server route (REST, Colyseus matchmaking and WebSockets) is served under
+ * this prefix so one public route can expose the whole server on a shared domain.
+ */
+export const API_PREFIX = '/api';

@@ -1,7 +1,11 @@
 **/node_modules
 **/dist
-apps/web
+# The image only needs the web app's manifest (for the workspace lockfile), not its source.
+apps/web/*
+!apps/web/package.json
 test-results
+docs
 .git
 **/.env
+**/.env.*
 apps/server/data

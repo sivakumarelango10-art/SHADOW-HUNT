@@ -8,11 +8,13 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Client, type Room } from '@colyseus/sdk';
 import { matchMaker } from 'colyseus';
 import { C2S, MAPS, S2C, type MatchResults, type SkillCheckMsg } from '@shadow-hunt/shared';
-import { createGameServer } from '../src/index.ts';
+import { startGameServer } from '../src/index.ts';
 import type { ShadowHuntRoom } from '../src/rooms/ShadowHuntRoom.ts';
 
 const PORT = 3591;
 const HTTP = `http://localhost:${PORT}`;
+/** Same endpoint shape the browser uses in production: everything under /api. */
+const GAME = `ws://localhost:${PORT}/api`;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function waitFor(cond: () => boolean, label: string, ms = 9000) {
   const start = Date.now();
@@ -32,7 +34,7 @@ async function guest(name: string): Promise<{ token: string; id: string }> {
   return { token: j.token, id: j.profile.id };
 }
 
-let server: ReturnType<typeof createGameServer>;
+let server: Awaited<ReturnType<typeof startGameServer>>;
 const names = ['Host', 'Hunter', 'Cara', 'Dev', 'Ezra'];
 const tokens: { token: string; id: string }[] = [];
 const rooms: Room[] = [];
@@ -48,8 +50,7 @@ function game() {
 const st = (r: Room) => r.state as any;
 
 beforeAll(async () => {
-  server = createGameServer();
-  await server.listen(PORT);
+  server = await startGameServer(PORT);
   for (const n of names) tokens.push(await guest(n));
 }, 30000);
 
@@ -60,7 +61,7 @@ afterAll(async () => {
 
 describe('multiplayer match', () => {
   it('creates a private room and five players join by code', async () => {
-    const host = new Client(`ws://localhost:${PORT}`);
+    const host = new Client(GAME);
     const r0 = await host.create('shadow_hunt', { token: tokens[0]!.token, mode: 'private' });
     rooms.push(r0);
     code = r0.roomId;
@@ -70,7 +71,7 @@ describe('multiplayer match', () => {
     expect(info.exists).toBe(true);
 
     for (let i = 1; i < 5; i++) {
-      const c = new Client(`ws://localhost:${PORT}`);
+      const c = new Client(GAME);
       rooms.push(await c.joinById(code, { token: tokens[i]!.token }));
     }
     for (const r of rooms) {
@@ -83,7 +84,7 @@ describe('multiplayer match', () => {
   });
 
   it('rejects bad tokens and quick match never lands in a private room', async () => {
-    const c = new Client(`ws://localhost:${PORT}`);
+    const c = new Client(GAME);
     await expect(c.joinById(code, { token: 'g1.forged.sig' })).rejects.toBeTruthy();
     const extra = await guest('Quick');
     const q = await c.joinOrCreate('shadow_hunt', { token: extra.token, mode: 'quick' });

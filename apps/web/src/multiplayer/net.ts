@@ -13,7 +13,7 @@ import {
   type SkillCheckResultMsg,
   type TrackMsg,
 } from '@shadow-hunt/shared';
-import { WS_URL } from '../services/api';
+import { GAME_ENDPOINT } from '../services/api';
 import { useRoom, type PlayerView, type RoomSnapshot } from '../stores/room';
 import { useSession } from '../stores/session';
 import { clearSamples, pushSample } from '../game/systems/interpolation';
@@ -31,7 +31,7 @@ let rtt = 80;
 export const netStats = { patches: 0 };
 
 function getClient() {
-  client ??= new Client(WS_URL);
+  client ??= new Client(GAME_ENDPOINT);
   return client;
 }
 
@@ -151,15 +151,49 @@ function scheduleSnapshot(force = false) {
   }
 }
 
-function attach(r: Room) {
-  room = r;
-  const store = useRoom.getState();
-  store.set({ connection: 'connected', error: null, sessionId: r.sessionId, results: null, chat: [] });
+function saveResume(r: Room) {
   try {
     sessionStorage.setItem(RESUME_KEY, JSON.stringify({ token: r.reconnectionToken, roomId: r.roomId, at: Date.now() }));
   } catch {
     /* ignore */
   }
+}
+
+/** Close codes after which we must not try to get back in. */
+const FINAL_CLOSE = new Set([4000 /* consented leave */, 4100 /* kicked by host */]);
+
+/**
+ * Fallback for connections the SDK does not auto-reconnect (it only retries a few
+ * close codes). Hosting platforms can end long-lived sockets with other codes —
+ * e.g. Vercel closes a WebSocket when the function reaches its max duration — and the
+ * server keeps the seat for 45 s in a match, so we retry with the reconnection token.
+ */
+let recovering: string | null = null;
+async function recover(token: string): Promise<boolean> {
+  recovering = token;
+  useRoom.getState().set({ connection: 'reconnecting' });
+  for (let attempt = 0; attempt < 8; attempt++) {
+    await new Promise((res) => setTimeout(res, Math.min(4000, 400 * 2 ** attempt)));
+    if (recovering !== token) return false; // the player left on purpose meanwhile
+    try {
+      const r = await getClient().reconnect(token);
+      attach(r, true);
+      return true;
+    } catch (e) {
+      const msg = String((e as Error)?.message ?? e);
+      // The seat is gone (room closed or reservation expired): stop retrying.
+      if (/not found|expired|invalid|locked/i.test(msg)) break;
+    }
+  }
+  return false;
+}
+
+function attach(r: Room, resumed = false) {
+  room = r;
+  const store = useRoom.getState();
+  if (resumed) store.set({ connection: 'connected', error: null, sessionId: r.sessionId });
+  else store.set({ connection: 'connected', error: null, sessionId: r.sessionId, results: null, chat: [] });
+  saveResume(r);
   r.reconnection.maxRetries = 12;
 
   r.onStateChange((state: any) => {
@@ -197,10 +231,18 @@ function attach(r: Room) {
   r.onDrop(() => useRoom.getState().set({ connection: 'reconnecting' }));
   r.onReconnect(() => {
     useRoom.getState().set({ connection: 'connected' });
+    saveResume(r); // the reconnection token rotates on every reconnect
     scheduleSnapshot(true);
   });
-  r.onLeave((code: number) => {
+  r.onLeave(async (code: number) => {
     if (room !== r) return;
+    const token = r.reconnectionToken;
+    const kicked = useRoom.getState().error;
+    if (!FINAL_CLOSE.has(code) && !kicked && token) {
+      // Keep the scene and HUD up while we try to slip back into the same seat.
+      if (await recover(token)) return;
+      if (room !== r) return; // the player left or joined something else meanwhile
+    }
     room = null;
     clearSamples();
     if (pingTimer) clearInterval(pingTimer);
@@ -209,7 +251,6 @@ function attach(r: Room) {
     } catch {
       /* ignore */
     }
-    const kicked = useRoom.getState().error;
     useRoom.getState().reset();
     if (code !== 4000) useRoom.getState().set({ error: kicked ?? 'Disconnected from the room.' });
   });
@@ -271,6 +312,7 @@ export async function tryResume(): Promise<boolean> {
 export async function leaveRoom() {
   const r = room;
   room = null;
+  recovering = null;
   clearSamples();
   try {
     sessionStorage.removeItem(RESUME_KEY);
